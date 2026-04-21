@@ -10,7 +10,7 @@
 typedef struct
 {
     char *NOME;
-    //ListaPessoas *LClientes; // Lista das pessoas que andam às compras
+    //ListaPessoas *LClientes; // Lista das pessoas que andam ï¿½s compras
     //ListaProdutos *LProdutos;
     //Hashing       *HCaixas;
     //HoraInicio, HoraFim;
@@ -26,4 +26,4 @@ int Supermercado_E_Para_Fechar(Supermercado *S);
 void DestruirSupermercado(Supermercado *S);
 
 
-#endif // SUPERMERCADO_H_INCLUDED
+#endif // SUPERMERCADO_H_INCLUDEDgg
