@@ -1,8 +1,14 @@
+// Funções para lista de clientes ativos no supermercado
+void inicializarListaClientesAtivos(NodoCliente **lista);
+void inserirClienteAtivo(NodoCliente **lista, Pessoa *cliente);
+void removerClienteAtivoPorId(NodoCliente **lista, const char *id);
+void liberarListaClientesAtivos(NodoCliente **lista);
 #ifndef PESSOA_H_INCLUDED
 #define PESSOA_H_INCLUDED
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "Produto.h"
 
 //------------------------------------------------------------------------------
