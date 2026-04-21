@@ -91,8 +91,8 @@ void calcularTotaisPessoa(Pessoa *p) {
     p->tempoCaixa = 0;
     for (int i = 0; i < p->numProdutos; i++) {
         p->totalGasto += p->produtos[i].preco;
-        p->tempoCompra += p->produtos[i].tempoCompra;
-        p->tempoCaixa += p->produtos[i].tempoCaixa;
+        p->tempoCompra += p->produtos[i].tempo_compra;
+        p->tempoCaixa += p->produtos[i].tempo_caixa;
     }
 }
 
@@ -100,7 +100,7 @@ void calcularTotaisPessoa(Pessoa *p) {
 int pessoaTemProduto(const Pessoa *p, const char *codigoProduto) {
     if (!p || !codigoProduto) return 0;
     for (int i = 0; i < p->numProdutos; i++) {
-        if (strcmp(p->produtos[i].codigo, codigoProduto) == 0) return 1;
+        if (strcmp(p->produtos[i].id, codigoProduto) == 0) return 1;
     }
     return 0;
 }
