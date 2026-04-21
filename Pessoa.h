@@ -18,13 +18,14 @@ void liberarListaClientesAtivos(NodoCliente **lista);
 // Estrutura que representa um cliente/pessoa no supermercado
 typedef struct {
     char id[16];           // Identificador do cliente (ex: P1, P21)
+    char nome[128];        // Nome do cliente
     int numProdutos;       // Número de produtos
     Produto *produtos;     // Array dinâmico de produtos
     float totalGasto;      // Soma dos preços dos produtos
     int tempoCompra;       // Soma dos tempos de compra dos produtos
     int tempoCaixa;        // Soma dos tempos de caixa dos produtos
     int estado;           // Estado do cliente (ex: 0 = compras, 1 = espera, 2 = atendimento, 3 = out, etc.)
-    int countVezesIdas;   // Contador de vezes que o cliente foi ao supermercado
+    int countVezesIda;   // Contador de vezes que o cliente foi ao supermercado
     // Outros campos úteis podem ser adicionados (ex: estado, tempo de espera, etc.)
 } Pessoa;
 
@@ -45,7 +46,7 @@ typedef struct NodoCliente {
 //------------------------------------------------------------------------------
 
 // 1. Carregar universo de clientes do ficheiro
-UniversoClientes carregarUniversoClientes(const char *ficheiro, Produto *produtosDisponiveis, int totalProdutosDisponiveis);
+UniversoClientes carregarUniversoClientes(const char *ficheiro);
 
 // 2. Libertar universo de clientes
 void libertarUniversoClientes(UniversoClientes *universo);
