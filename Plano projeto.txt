@@ -254,3 +254,58 @@ Nos ficheiros .c:
 - Cumprir as funcionalidades centrais do enunciado.
 - Mostrar dominio das estruturas de dados usadas.
 
+15. Estado atual do projeto
+
+15.1 Ja implementado
+- [x] Relogio.h definido com a struct e prototipos base.
+- [x] Relogio.c implementado com criar, destruir, mostrar, acertar, obter segundos e avancar.
+- [x] Produto.h definido com Produto, No, Lista e prototipos base.
+- [x] Produto.c implementado com criar, destruir, copiar e obter o produto mais barato.
+- [x] Uteis.h / Uteis.c com funcoes base: Aleatorio, LerInteiro, ToMaiscula, wait e wait_segundos.
+- [x] main.c com loop principal, menu minimo e chamada a ExecutarSimulacao.
+- [x] Ficheiros base presentes no projeto: config.txt, clientes.txt, produtos.txt e funcionarios.txt.
+
+15.2 Parcial
+- [~] Supermercado.h existe mas ainda esta em rascunho.
+- [~] Supermercado.c existe mas ainda nao esta alinhado com a estrutura atual.
+- [~] main.c tem menu base mas ainda muito incompleto.
+- [~] TeclaPressionada() existe apenas como stub.
+
+15.3 Ainda por fazer
+- [ ] Pessoa.h / Pessoa.c
+- [ ] Caixa.h / Caixa.c
+- [ ] Lista biligada para filas de clientes
+- [ ] Estados de cliente e caixa com enum
+- [ ] Leitura real de config.txt
+- [ ] Carregamento real de clientes.txt
+- [ ] Carregamento real de produtos.txt
+- [ ] Carregamento real de funcionarios.txt
+- [ ] Entrada de clientes na simulacao
+- [ ] Passagem cliente -> fila da caixa
+- [ ] Atendimento em caixa
+- [ ] Calculo de tempo de espera
+- [ ] Oferta do produto mais barato se exceder MAX_ESPERA
+- [ ] Abrir e fechar caixas automaticamente
+- [ ] Redistribuicao de clientes
+- [ ] Pesquisa de pessoas
+- [ ] Historico de utilizacao e simulacao em ficheiro
+- [ ] Estatisticas finais
+- [ ] Memoria usada e desperdicada
+
+15.4 Checklist resumida
+- [x] Produto
+- [ ] Pessoa
+- [x] Relogio
+- [ ] Caixa
+- [ ] Lista/Fila de clientes
+- [ ] Configuracao carregada do ficheiro
+- [ ] Clientes carregados do ficheiro
+- [ ] Produtos carregados do ficheiro
+- [ ] Funcionarios carregados do ficheiro
+- [~] Menu base
+- [~] Supermercado base
+- [ ] Simulacao funcional
+- [ ] Ofertas por excesso de espera
+- [ ] Historico CSV/TXT
+- [ ] Estatisticas finais
+

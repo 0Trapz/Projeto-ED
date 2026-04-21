@@ -11,8 +11,7 @@
 
 
 typedef struct
-{
-    int maxEspera;
+{   int maxEspera;
     int nCaixas;
     int maxFila;
     int minFila;
@@ -23,27 +22,35 @@ typedef struct
     //ListaPessoas *LClientes; // Lista das pessoas que andam �s compras
     //ListaProdutos *LProdutos;
     //Hashing       *HCaixas;
-    //HoraInicio, HoraFim;
+    
     int CadenciaEntradaClientes;
     Relogio *Rolex;
 } CONFIGURACAO, *ptCONFIGURACAO;
 
 typedef struct
-{
-    char nome[Supermercado + 1];
+{ 
+    char nome[50];
     CONFIGURACAO config;
-    ptRelogio relogio;
-    ptCAIXA caixas;
-    int totalCloentesAtendidos;
-    int totalPRo
+    ptRelogio relogio;    
+    //ptCaixa caixas;
+    int totalClientesAtendidos;
+    int totalProdutosVendidos;
+    int totalProdutosOferecidos;
+    float custoTotalOfertas;
 } Supermercado, *ptSupermercado;
 
+
 Supermercado *CriarSupermercado(char *nome);
-int InicializarSupermercado(Supermercado *S, char *config);
-int ExecutarSimulacao(Supermercado *S);
-void EntradaPessoaSupermercado(Supermercado *S);
-int Supermercado_E_Para_Fechar(Supermercado *S);
-void DestruirSupermercado(Supermercado *S);
+int InicializarSupermercado(ptSupermercado *s, char *nomeFicheiroConfig);
+void MostrarSupermercado(ptSupermercado s);
+int ExecutarSimulacao(ptSupermercado s);
+void EntrarPessoaSupermercado(ptSupermercado s);
+float CalcularMediaFilas(ptSupermercado s);
+int AbrirSupermercado(ptSupermercado s);
+int FecharSupermercado(ptSupermercado s);
+int Supermercado_E_Para_Fechar(ptSupermercado s);
+void DestruirSupermercado(ptSupermercado s);
 
 
-#endif // SUPERMERCADO_H_INCLUDEDgg
+
+#endif 
