@@ -1,0 +1,256 @@
+PLANO DO PROJETO
+Gestao de Caixas de um Supermercado
+
+1. Objetivo do projeto
+- Gerir o conjunto de caixas de atendimento de um supermercado.
+- Controlar filas de clientes.
+- Abrir e fechar caixas conforme a carga media das filas.
+- Minimizar o numero de caixas abertas sem ultrapassar o tempo maximo de espera.
+- Guardar estatisticas de atendimento, produtos e perdas por produtos oferecidos.
+
+2. Ideia central do sistema
+- O supermercado tem varias caixas.
+- Cada caixa tem uma fila de clientes.
+- Cada cliente tem um numero de produtos.
+- O tempo de atendimento depende do numero de produtos.
+- Se a espera media aumentar demasiado, pode ser necessario abrir caixas.
+- Se a espera media baixar demasiado, pode ser necessario fechar caixas.
+- Se um cliente esperar mais do que MAX_ESPERA, um produto pode ser oferecido.
+
+3. Modulos principais
+
+3.1 main.c
+- Arranque do programa.
+- Carregar dados iniciais.
+- Mostrar menus.
+- Chamar as funcionalidades principais.
+- Encerrar o programa corretamente.
+
+3.2 Supermercado.h / Supermercado.c
+- Modulo central do projeto.
+- Guarda o estado global do sistema.
+- Guarda configuracoes, caixas, estatisticas e relogio.
+- Coordena abertura e fecho de caixas.
+- Coordena distribuicao e redistribuicao de clientes.
+
+3.3 Caixa.h / Caixa.c
+- Representa cada caixa.
+- Indica se esta ativa, inativa ou a fechar.
+- Guarda a fila de clientes.
+- Guarda estatisticas proprias da caixa.
+- Permite atender clientes.
+
+3.4 Pessoa.h / Pessoa.c
+- Representa um cliente.
+- Guarda identificacao.
+- Guarda numero de produtos.
+- Guarda instante de entrada na fila.
+- Guarda tempo de espera e outros dados uteis.
+
+3.5 Produto.h / Produto.c
+- Representa um produto.
+- Guarda nome e preco.
+- Pode ser simplificado no inicio se so for necessario contar produtos e calcular custo.
+
+3.6 Relogio.h / Relogio.c
+- Controla o tempo da simulacao.
+- Permite avancar o tempo.
+- Permite obter o instante atual.
+
+3.7 Ficheiros.h / Ficheiros.c
+- Ler Configuracao.txt.
+- Ler Dados.txt.
+- Gravar historico de simulacao.
+- Gravar historico de utilizacao em CSV.
+
+3.8 Uteis.h / Uteis.c
+- Funcoes auxiliares genericas.
+- Leitura segura de inteiros.
+- Gera numeros aleatorios.
+- Conversoes simples.
+- Outras funcoes reutilizaveis.
+
+3.9 Estruturas de dados
+- Fila para clientes em espera em cada caixa.
+- Lista para gerir caixas e historicos.
+- Hashing ou arvore para pesquisa rapida de pessoas.
+
+4. Estruturas principais a definir
+
+4.1 Supermercado
+- nome
+- configuracao
+- conjunto de caixas
+- relogio
+- total de clientes atendidos
+- total de produtos vendidos
+- total de produtos oferecidos
+- custo total dos produtos oferecidos
+- historico ou estatisticas globais
+
+4.2 Configuracao
+- MAX_ESPERA
+- N_CAIXAS
+- TEMPO_ATENDIMENTO_PRODUTO
+- MAX_PRECO
+- MAX_FILA
+- MIN_FILA
+
+4.3 Caixa
+- id da caixa
+- estado da caixa
+- fila de clientes
+- numero de clientes atendidos
+- numero de produtos vendidos
+- nome do operador
+- total de tempo de atendimento
+
+4.4 Pessoa
+- id ou nome
+- numero de produtos
+- instante de entrada na fila
+- instante de atendimento
+- tempo de espera
+- caixa atual
+
+4.5 Produto
+- nome
+- preco
+- tempo de atendimento associado ou custo temporal por produto
+
+5. Estruturas de dados recomendadas
+- Fila ligada para clientes em cada caixa.
+- Lista ligada ou vetor dinamico para o conjunto de caixas.
+- Hash table para procurar rapidamente uma pessoa pelo nome ou id.
+- Lista ou tabela para historico final e eventos relevantes.
+
+6. Funcionalidades obrigatorias do projeto
+- Carregar configuracoes e dados iniciais dos ficheiros.
+- Gravar dados e estatisticas.
+- Gravar historico de acoes do utilizador em CSV.
+- Permitir mudanca de clientes entre caixas.
+- Abrir nova caixa manualmente ou quando a media das filas ultrapassa MAX_FILA.
+- Fechar caixa quando a media das filas abertas for inferior a MIN_FILA.
+- Redistribuir pessoas quando uma caixa fecha.
+- Pesquisar uma pessoa numa caixa.
+- Determinar memoria utilizada.
+- Determinar memoria desperdicada.
+- Calcular medidas finais de desempenho.
+
+7. Regras de negocio essenciais
+- Uma caixa so atende clientes se estiver ativa.
+- Se a caixa estiver a fechar, termina os clientes atuais e depois encerra.
+- Se uma caixa fechar imediatamente, os clientes devem ser distribuidos pelas restantes caixas abertas.
+- O tempo de espera deve ser calculado para cada cliente.
+- Se o cliente ultrapassar MAX_ESPERA, um produto pode ser oferecido.
+- O sistema deve acumular o numero total e o custo total desses produtos oferecidos.
+
+8. Medidas de desempenho a apresentar no fim
+- Caixa que atendeu mais pessoas.
+- Caixa que vendeu mais produtos.
+- Lista de pessoas atendidas por cada caixa.
+- Operador que atendeu menos pessoas.
+- Numero de produtos oferecidos.
+- Valor total perdido em produtos oferecidos.
+- Tempo medio de espera.
+
+9. Ordem ideal de implementacao
+
+Fase 1 - Analise
+- Ler o enunciado.
+- Identificar entidades.
+- Identificar regras do sistema.
+- Escolher estruturas de dados.
+
+Fase 2 - Definicao dos dados
+- Criar as structs principais.
+- Definir os headers.
+- Definir os prototipos das funcoes.
+
+Fase 3 - Base tecnica
+- Implementar filas/listas.
+- Implementar criacao e destruicao de estruturas.
+- Garantir alocacao e libertacao correta de memoria.
+
+Fase 4 - Leitura de ficheiros
+- Ler Configuracao.txt.
+- Ler Dados.txt.
+- Carregar tudo para memoria.
+
+Fase 5 - Logica do dominio
+- Criar supermercado.
+- Criar caixas.
+- Criar clientes.
+- Atender clientes.
+- Calcular tempos.
+- Abrir e fechar caixas.
+- Redistribuir clientes.
+
+Fase 6 - Pesquisa e estatisticas
+- Procurar pessoa.
+- Gerar medidas finais.
+- Calcular memoria usada e desperdicada.
+
+Fase 7 - Interface
+- Construir menus.
+- Registar historico das operacoes.
+- Exportar CSV.
+
+Fase 8 - Testes
+- Testar leitura de ficheiros.
+- Testar filas.
+- Testar abertura e fecho de caixas.
+- Testar redistribuicao.
+- Testar casos limite.
+
+10. Ordem pratica para o vosso grupo
+1. Definir Configuracao, Pessoa, Caixa e Supermercado.
+2. Implementar Fila de Pessoas.
+3. Implementar Caixa com fila.
+4. Implementar Supermercado com conjunto de caixas.
+5. Ler ficheiros de configuracao e dados.
+6. Implementar atendimento e tempos de espera.
+7. Implementar regras de abrir e fechar caixas.
+8. Implementar pesquisa de pessoas.
+9. Implementar estatisticas e exportacoes.
+10. Fazer limpeza, testes e validacao final.
+
+11. Dependencias entre entidades
+- Supermercado contem varias caixas.
+- Cada caixa contem uma fila de pessoas.
+- Cada pessoa tem produtos ou pelo menos numero de produtos.
+- Configuracao controla o comportamento do supermercado.
+- Relogio ajuda a calcular tempos de espera e atendimento.
+- Ficheiros alimentam o estado inicial e guardam os resultados.
+
+12. O que deve ficar no .h e no .c
+
+Nos ficheiros .h:
+- structs
+- enums
+- defines
+- prototipos
+- tipos auxiliares
+
+Nos ficheiros .c:
+- implementacao das funcoes
+- logica do programa
+- leitura e escrita concreta
+- calculos e regras de negocio
+
+13. Riscos a evitar
+- Misturar menu com logica do dominio.
+- Guardar tudo no main.c.
+- Nao libertar memoria.
+- Repetir codigo desnecessariamente.
+- Nao separar bem os modulos.
+- Nao testar ficheiros com dados grandes.
+- Nao tratar caixas a fechar corretamente.
+
+14. Meta final
+- Ter um programa modular, simples e claro.
+- Compilar sem erros.
+- Executar sem falhas.
+- Cumprir as funcionalidades centrais do enunciado.
+- Mostrar dominio das estruturas de dados usadas.
+
