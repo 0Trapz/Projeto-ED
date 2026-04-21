@@ -26,7 +26,7 @@ typedef struct
     //HoraInicio, HoraFim;
     int CadenciaEntradaClientes;
     Relogio *Rolex;
-} CONFIGURACAO, *ptCONFIGURACAO;~
+} CONFIGURACAO, *ptCONFIGURACAO;
 
 typedef struct
 {
@@ -46,4 +46,4 @@ int Supermercado_E_Para_Fechar(Supermercado *S);
 void DestruirSupermercado(Supermercado *S);
 
 
-#endif // SUPERMERCADO_H_INCLUDED
+#endif // SUPERMERCADO_H_INCLUDEDgg
