@@ -1,10 +1,5 @@
 #include "Pessoa.h"
 
-#include "Pessoa.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 // 1. Carregar universo de clientes do ficheiro (só esqueleto, implementar conforme formato do ficheiro)
 UniversoClientes carregarUniversoClientes(const char *ficheiro, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
     UniversoClientes universo = {NULL, 0};
@@ -25,14 +20,10 @@ void libertarUniversoClientes(UniversoClientes *universo) {
 
 // 3. Criar pessoa a partir de uma linha do ficheiro
 Pessoa* criarPessoaDeLinha(const char *linha, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
-    if (linha == NULL || produtosDisponiveis == NULL || totalProdutosDisponiveis <= 0) {
-        printf("Linha ou produtos disponíveis inválidos\n");
-        return NULL;
-    }
+    if (linha == NULL || produtosDisponiveis == NULL || totalProdutosDisponiveis <= 0) return NULL;
     char id[16];
     int numProdutos;
     if (sscanf(linha, "%15s : %d", id, &numProdutos) != 2) {
-        printf("Formato da linha inválido: %s\n", linha);
         return NULL;
     }
     return criarPessoaAleatoria(id, numProdutos, produtosDisponiveis, totalProdutosDisponiveis);
@@ -41,12 +32,10 @@ Pessoa* criarPessoaDeLinha(const char *linha, Produto *produtosDisponiveis, int 
 // 4. Criar pessoa com produtos aleatórios (opcional, útil para simulação)
 Pessoa* criarPessoaAleatoria(const char *id, int numProdutos, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
     if (id == NULL || numProdutos <= 0 || produtosDisponiveis == NULL || totalProdutosDisponiveis <= 0) {
-        printf("Parâmetros inválidos para criar pessoa aleatória\n");
         return NULL;
     }
     Pessoa *p = (Pessoa *)malloc(sizeof(Pessoa));
     if (!p) {
-        printf("Erro ao alocar memória para pessoa\n");
         return NULL;
     }
     strncpy(p->id, id, 15);
@@ -54,7 +43,6 @@ Pessoa* criarPessoaAleatoria(const char *id, int numProdutos, Produto *produtosD
     p->numProdutos = numProdutos;
     p->produtos = (Produto *)malloc(numProdutos * sizeof(Produto));
     if (!p->produtos) {
-        printf("Erro ao alocar memória para produtos da pessoa\n");
         free(p);
         return NULL;
     }

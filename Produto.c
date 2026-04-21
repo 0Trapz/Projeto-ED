@@ -1,5 +1,6 @@
 #include "Produto.h"
 
+// 1. Criar produto
 Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float tempo_caixa) {
     Produto *p = (Produto *)malloc(sizeof(Produto));
     if (!p) {
