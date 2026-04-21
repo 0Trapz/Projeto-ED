@@ -1,17 +1,24 @@
-#ifndef RELOGIO_H_INCLUDED
-#define RELOGIO_H_INCLUDED
+#ifndef Relogio_H_INCLUDED
+#define Relogio_H_INCLUDED
+
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-typedef struct
+
+typedef struct 
 {
-    time_t Tinicio;
-    int Velocidade;
-}Relogio;
-Relogio *CriarRelogio(int _velocidade);
-void DestruirRelogio(Relogio *R);
-time_t GetTempo(Relogio *R);
+    int horas;
+    int minutos;
+    int segundos;
+} Relogio, *ptRelogio; 
 
-#endif // RELOGIO_H_INCLUDED
+
+ptRelogio CriarRelogio(int h, int m, int s);
+void DestruirRelogio(ptRelogio r);
+void MostrarRelogio(ptRelogio r);
+int AcertarRelogio(ptRelogio r, int h, int m, int s);
+void AvancarRelogio(ptRelogio r, int segundos);
+int ObterSegundosRelogio(ptRelogio r);
+
+#endif 
