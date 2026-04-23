@@ -14,5 +14,6 @@ char ToMaiscula(char x);
 void wait(int mlseconds);
 void wait_segundos(int seconds);
 int TeclaPressionada();
+int LerLinhaFicheiro(FILE *f, char *destino, int tamanho);
 
 #endif // UTEIS_H

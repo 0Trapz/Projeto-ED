@@ -38,3 +38,11 @@ int TeclaPressionada() {
     while (getchar() != '\n');
     return 0;
 }
+
+// Função utilitária para ler uma linha de um ficheiro para buffer, removendo '\n'/'\r\n'.
+int LerLinhaFicheiro(FILE *f, char *destino, int tamanho) {
+    if (!f || !destino || tamanho <= 1) return 0;
+    if (!fgets(destino, tamanho, f)) return 0;
+    destino[strcspn(destino, "\r\n")] = '\0';
+    return 1;
+}
