@@ -1,5 +1,6 @@
 #include "Produto.h"
 
+// 1. Criar produto
 Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float tempo_caixa) {
     Produto *p = (Produto *)malloc(sizeof(Produto));
     if (!p) {
@@ -37,9 +38,9 @@ Produto* CopiarProduto(Produto * p) {
     return CriarProduto(p->id, p->nome, p->preco, p->tempo_compra, p->tempo_caixa);
 }
 
-Produto* ObterProdutoMaisBarato(Lista *lista) {
+int ObterProdutoMaisBarato(Lista *lista) {
     if (!lista || lista->tamanho == 0){
-        return NULL;
+        return -1;
     }
 
     Produto *mais_barato = NULL;

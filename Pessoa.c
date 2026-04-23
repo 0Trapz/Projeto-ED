@@ -1,130 +1,89 @@
 #include "Pessoa.h"
 
-#include "Pessoa.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-// 1. Carregar universo de clientes do ficheiro (só esqueleto, implementar conforme formato do ficheiro)
-UniversoClientes carregarUniversoClientes(const char *ficheiro, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
+//------------------------------------------------------------------------------
+// Funções de universo de clientes
+//------------------------------------------------------------------------------
+UniversoClientes carregarUniversoClientes(const char *ficheiro) {
     UniversoClientes universo = {NULL, 0};
-    // TODO: Implementar leitura do ficheiro e preenchimento do array
+    FILE *f = fopen(ficheiro, "r");
+    if (!f) return universo;
+
+    int total = 0;
+    char linha[256];
+    while (fgets(linha, sizeof(linha), f)) total++;
+    rewind(f);
+
+    universo.array = (Pessoa*)calloc(total, sizeof(Pessoa));
+    universo.total = total;
+
+    int idx = 0;
+    while (fgets(linha, sizeof(linha), f) && idx < total) {
+        char id[16], nome[128];
+        if (sscanf(linha, "%15s %[^]", id, nome) == 2) {
+            strncpy(universo.array[idx].id, id, 15);
+            universo.array[idx].id[15] = '\0';
+            strncpy(universo.array[idx].nome, nome, 127);
+            universo.array[idx].nome[127] = '\0';
+            universo.array[idx].numProdutos = 0;
+            universo.array[idx].produtos = NULL;
+            universo.array[idx].totalGasto = 0;
+            universo.array[idx].tempoCompra = 0;
+            universo.array[idx].tempoCaixa = 0;
+            universo.array[idx].estado = 0;
+            universo.array[idx].countVezesIda = 0;
+            idx++;
+        }
+    }
+    fclose(f);
+    universo.total = idx;
     return universo;
 }
 
-// 2. Libertar universo de clientes
 void libertarUniversoClientes(UniversoClientes *universo) {
     if (!universo || !universo->array) return;
-    for (int i = 0; i < universo->total; i++) {
-        libertarPessoa(&universo->array[i]);
-    }
     free(universo->array);
     universo->array = NULL;
     universo->total = 0;
 }
 
-// 3. Criar pessoa a partir de uma linha do ficheiro
-Pessoa* criarPessoaDeLinha(const char *linha, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
-    if (linha == NULL || produtosDisponiveis == NULL || totalProdutosDisponiveis <= 0) {
-        printf("Linha ou produtos disponíveis inválidos\n");
-        return NULL;
-    }
-    char id[16];
-    int numProdutos;
-    if (sscanf(linha, "%15s : %d", id, &numProdutos) != 2) {
-        printf("Formato da linha inválido: %s\n", linha);
-        return NULL;
-    }
-    return criarPessoaAleatoria(id, numProdutos, produtosDisponiveis, totalProdutosDisponiveis);
-}
-
-// 4. Criar pessoa com produtos aleatórios (opcional, útil para simulação)
-Pessoa* criarPessoaAleatoria(const char *id, int numProdutos, Produto *produtosDisponiveis, int totalProdutosDisponiveis) {
-    if (id == NULL || numProdutos <= 0 || produtosDisponiveis == NULL || totalProdutosDisponiveis <= 0) {
-        printf("Parâmetros inválidos para criar pessoa aleatória\n");
-        return NULL;
-    }
+//------------------------------------------------------------------------------
+// Funções de criação e destruição de clientes
+//------------------------------------------------------------------------------
+Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, Produto *produtosDisponiveis, int totalProdutosDisponiveis, int numProdutos) {
+    if (!universo || idx < 0 || idx >= universo->total || !produtosDisponiveis || totalProdutosDisponiveis <= 0 || numProdutos <= 0) return NULL;
+    Pessoa *origem = &universo->array[idx];
     Pessoa *p = (Pessoa *)malloc(sizeof(Pessoa));
-    if (!p) {
-        printf("Erro ao alocar memória para pessoa\n");
-        return NULL;
-    }
-    strncpy(p->id, id, 15);
+    if (!p) return NULL;
+    strncpy(p->id, origem->id, 15);
     p->id[15] = '\0';
+    strncpy(p->nome, origem->nome, 127);
+    p->nome[127] = '\0';
     p->numProdutos = numProdutos;
     p->produtos = (Produto *)malloc(numProdutos * sizeof(Produto));
-    if (!p->produtos) {
-        printf("Erro ao alocar memória para produtos da pessoa\n");
-        free(p);
-        return NULL;
-    }
+    if (!p->produtos) { free(p); return NULL; }
     for (int i = 0; i < numProdutos; i++) {
         int idxProduto = rand() % totalProdutosDisponiveis;
         p->produtos[i] = produtosDisponiveis[idxProduto];
     }
-    calcularTotaisPessoa(p);
+    p->totalGasto = 0.0f;
+    p->tempoCompra = 0;
+    p->tempoCaixa = 0;
+    p->estado = 0;
+    p->countVezesIda = origem->countVezesIda + 1;
+    p->totalGastoHistorico = origem->totalGastoHistorico;
+    p->totalTempoHistorico = origem->totalTempoHistorico;
     return p;
 }
 
-// 5. Libertar a memória de uma pessoa
 void libertarPessoa(Pessoa *p) {
     if (!p) return;
     if (p->produtos) free(p->produtos);
     free(p);
 }
 
-// 6. Mostrar os dados de uma pessoa
-void mostrarPessoa(const Pessoa *p) {
-    if (!p) return;
-    printf("ID: %s\n", p->id);
-    printf("Número de produtos: %d\n", p->numProdutos);
-    printf("Total gasto: %.2f\n", p->totalGasto);
-    printf("Tempo de compra: %d\n", p->tempoCompra);
-    printf("Tempo de caixa: %d\n", p->tempoCaixa);
-}
-
-// 7. Calcular totais (gasto, tempo de compra, tempo de caixa)
-void calcularTotaisPessoa(Pessoa *p) {
-    if (!p) return;
-    p->totalGasto = 0.0f;
-    p->tempoCompra = 0;
-    p->tempoCaixa = 0;
-    for (int i = 0; i < p->numProdutos; i++) {
-        p->totalGasto += p->produtos[i].preco;
-        p->tempoCompra += p->produtos[i].tempo_compra;
-        p->tempoCaixa += p->produtos[i].tempo_caixa;
-    }
-}
-
-// 8. Verificar se a pessoa tem um produto específico (por código)
-int pessoaTemProduto(const Pessoa *p, const char *codigoProduto) {
-    if (!p || !codigoProduto) return 0;
-    for (int i = 0; i < p->numProdutos; i++) {
-        if (strcmp(p->produtos[i].id, codigoProduto) == 0) return 1;
-    }
-    return 0;
-}
-
-// 9. Oferecer o produto mais barato a uma pessoa
-Produto* oferecerProdutoMaisBarato(Pessoa *p) {
-    if (!p || p->numProdutos == 0 || !p->produtos) return NULL;
-    int idxMaisBarato = 0;
-    for (int i = 1; i < p->numProdutos; i++) {
-        if (p->produtos[i].preco < p->produtos[idxMaisBarato].preco) idxMaisBarato = i;
-    }
-    Produto* oferecido = (Produto*)malloc(sizeof(Produto));
-    if (!oferecido) return NULL;
-    *oferecido = p->produtos[idxMaisBarato];
-    for (int i = idxMaisBarato; i < p->numProdutos - 1; i++) {
-        p->produtos[i] = p->produtos[i + 1];
-    }
-    p->numProdutos--;
-    p->produtos = realloc(p->produtos, p->numProdutos * sizeof(Produto));
-    calcularTotaisPessoa(p);
-    return oferecido;
-}
-
-// 10. Adicionar cliente à lista ligada de clientes ativos
+//------------------------------------------------------------------------------
+// Funções de listas ligadas (ativos e histórico)
+//------------------------------------------------------------------------------
 void adicionarClienteAtivo(NodoCliente **lista, Pessoa *cliente) {
     if (!cliente) return;
     NodoCliente *novo = (NodoCliente *)malloc(sizeof(NodoCliente));
@@ -134,7 +93,6 @@ void adicionarClienteAtivo(NodoCliente **lista, Pessoa *cliente) {
     *lista = novo;
 }
 
-// 11. Remover cliente da lista ligada de clientes ativos (por id)
 void removerClienteAtivo(NodoCliente **lista, const char *id) {
     if (!lista || !*lista || !id) return;
     NodoCliente *atual = *lista, *anterior = NULL;
@@ -150,7 +108,6 @@ void removerClienteAtivo(NodoCliente **lista, const char *id) {
     }
 }
 
-// 12. Libertar toda a lista ligada de clientes ativos
 void libertarListaClientesAtivos(NodoCliente **lista) {
     if (!lista) return;
     NodoCliente *atual = *lista;
@@ -160,4 +117,154 @@ void libertarListaClientesAtivos(NodoCliente **lista) {
         free(temp);
     }
     *lista = NULL;
+}
+
+Pessoa* procurarClienteAtivo(NodoCliente *ativos, const char *id) {
+    while (ativos) {
+        if (strcmp(ativos->cliente->id, id) == 0) return ativos->cliente;
+        ativos = ativos->prox;
+    }
+    return NULL;
+}
+
+void adicionarClienteHistorico(NodoCliente **historico, Pessoa *cliente) {
+    if (!cliente) return;
+    NodoCliente *novo = (NodoCliente *)malloc(sizeof(NodoCliente));
+    if (!novo) return;
+    novo->cliente = cliente;
+    novo->prox = *historico;
+    *historico = novo;
+}
+
+void libertarListaClientesHistorico(NodoCliente **historico) {
+    if (!historico) return;
+    NodoCliente *atual = *historico;
+    while (atual) {
+        NodoCliente *temp = atual;
+        atual = atual->prox;
+        libertarPessoa(temp->cliente);
+        free(temp);
+    }
+    *historico = NULL;
+}
+
+void moverClienteParaHistorico(NodoCliente **ativos, NodoCliente **historico, const char *id) {
+    if (!ativos || !*ativos || !historico || !id) return;
+    NodoCliente *atual = *ativos, *anterior = NULL;
+    while (atual) {
+        if (strcmp(atual->cliente->id, id) == 0) {
+            if (anterior) anterior->prox = atual->prox;
+            else *ativos = atual->prox;
+            atual->cliente->estado = 3; // Exemplo: 3 = histórico
+            adicionarClienteHistorico(historico, atual->cliente);
+            free(atual);
+            return;
+        }
+        anterior = atual;
+        atual = atual->prox;
+    }
+}
+
+Pessoa* procurarClienteHistorico(NodoCliente *historico, const char *id) {
+    while (historico) {
+        if (strcmp(historico->cliente->id, id) == 0) return historico->cliente;
+        historico = historico->prox;
+    }
+    return NULL;
+}
+
+void removerClienteHistorico(NodoCliente **historico, const char *id) {
+    if (!historico || !*historico || !id) return;
+    NodoCliente *atual = *historico, *anterior = NULL;
+    while (atual) {
+        if (strcmp(atual->cliente->id, id) == 0) {
+            if (anterior) anterior->prox = atual->prox;
+            else *historico = atual->prox;
+            libertarPessoa(atual->cliente);
+            free(atual);
+            return;
+        }
+        anterior = atual;
+        atual = atual->prox;
+    }
+}
+
+//------------------------------------------------------------------------------
+// Funções utilitárias de cliente
+//------------------------------------------------------------------------------
+void mostrarPessoa(const Pessoa *p) {
+    if (!p) return;
+    printf("ID: %s\n", p->id);
+    printf("Nome: %s\n", p->nome);
+    printf("Número de produtos: %d\n", p->numProdutos);
+    printf("Total gasto: %.2f\n", p->totalGasto);
+    printf("Tempo de compra: %d\n", p->tempoCompra);
+    printf("Tempo de caixa: %d\n", p->tempoCaixa);
+    printf("Estado: %d\n", p->estado);
+    printf("Entradas: %d\n", p->countVezesIda);
+}
+
+void calcularTotaisPessoa(Pessoa *p) {
+    if (!p) return;
+    p->totalGasto = 0.0f;
+    p->tempoCompra = 0;
+    p->tempoCaixa = 0;
+    for (int i = 0; i < p->numProdutos; i++) {
+        p->totalGasto += p->produtos[i].preco;
+        p->tempoCompra += p->produtos[i].tempo_compra;
+        p->tempoCaixa += p->produtos[i].tempo_caixa;
+    }
+}
+
+int pessoaTemProduto(const Pessoa *p, const char *codigoProduto) {
+    if (!p || !codigoProduto) return 0;
+    for (int i = 0; i < p->numProdutos; i++) {
+        if (strcmp(p->produtos[i].nome, codigoProduto) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+Produto* oferecerProdutoMaisBarato(Pessoa *p, Lista *produtosDisponiveis) {
+    if (!p || !produtosDisponiveis || produtosDisponiveis->tamanho <= 0) return NULL;
+    Produto *mais_barato = ObterProdutoMaisBarato(produtosDisponiveis);
+    if (!mais_barato) return NULL;
+
+    // Remover apenas UM produto mais barato da lista
+    No *anterior = NULL, *atual = produtosDisponiveis->inicio;
+    while (atual) {
+        Produto *prod = (Produto *)atual->dados;
+        if (prod == mais_barato) {
+            // Mostrar produto
+            printf("Produto oferecido: %s | Preço: %.2f\n", prod->nome, prod->preco);
+            // Atualizar total gasto da pessoa
+            p->totalGasto -= prod->preco;
+            if (p->totalGasto < 0) p->totalGasto = 0;
+            // Remover nó
+            if (anterior) anterior->proximo = atual->proximo;
+            else produtosDisponiveis->inicio = atual->proximo;
+            if (produtosDisponiveis->fim == atual) produtosDisponiveis->fim = anterior;
+            produtosDisponiveis->tamanho--;
+            Produto *copia = CopiarProduto(prod);
+            DestruirProduto(prod);
+            free(atual);
+            printf("Novo total: %.2f\n", p->totalGasto);
+            return copia;
+        }
+        anterior = atual;
+        atual = atual->proximo;
+    }
+    return NULL;
+}
+
+//------------------------------------------------------------------------------
+// Função de registo CSV
+//------------------------------------------------------------------------------
+void registarAcaoCSV(const char *ficheiro, const char *acao, const Pessoa *cliente) {
+    if (!ficheiro || !acao || !cliente) return;
+    FILE *f = fopen(ficheiro, "a");
+    if (!f) return;
+    fprintf(f, "%s;%s;%s;%d;%d;%.2f;%d;%d\n", acao, cliente->id, cliente->nome, cliente->numProdutos, cliente->estado, cliente->totalGasto, cliente->tempoCompra, cliente->tempoCaixa);
+    fclose(f);
 }

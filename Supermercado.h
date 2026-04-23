@@ -9,41 +9,67 @@
 #include "Relogio.h"
 //#include "Caixa.h"
 
+#define MAX_NOME_SUPERMERCADO 50
+#define MAX_FUNCIONARIOS 100
+#define MAX_NOME_FUNCIONARIO 80
+
 
 typedef struct
-{
-    int maxEspera;
+{   int maxEspera;
     int nCaixas;
     int maxFila;
     int minFila;
     int tempoAtendimentoProduto;
     int cadenciaEntradaClientes;
     int horaAbertura;
-    int horaFecho;
-    //ListaPessoas *LClientes; // Lista das pessoas que andam �s compras
-    //ListaProdutos *LProdutos;
-    //Hashing       *HCaixas;
-    //HoraInicio, HoraFim;
+    int horaFecho;    
     int CadenciaEntradaClientes;
-    Relogio *Rolex;
+    Relogio *relogio;
 } CONFIGURACAO, *ptCONFIGURACAO;
 
 typedef struct
-{
-    char nome[Supermercado + 1];
+{ 
+    char nome[MAX_NOME_SUPERMERCADO + 1];
     CONFIGURACAO config;
-    ptRelogio relogio;
-    ptCAIXA caixas;
-    int totalCloentesAtendidos;
-    int totalPRo
+    ptRelogio relogio;  
+    Produto *produtosDisponiveis;
+    int TotalProdutosDisponiveis;
+    UniversoClientes universoClientes;
+    Pessoa *universoClientes;
+    int proximoCliente;
+
+    NodoCliente *clientesEmCompras;
+
+    char funcionarios[MAX_FUNCIONARIOS][MAX_NOME_FUNCIONARIO + 1];
+    int funcionarioEmUso[MAX_FUNCIONARIOS];
+    int totalFuncionarios;
+
+    //ptCaixa caixas;
+
+    int totalClientesAtendidos;
+    int totalProdutosVendidos;
+    int totalProdutosOferecidos;
+    float custoTotalOfertas;
+    int tempoTotalEspera;
+    int numeroTotalEsperas;
+
+
 } Supermercado, *ptSupermercado;
 
-Supermercado *CriarSupermercado(char *nome);
-int InicializarSupermercado(Supermercado *S, char *config);
-int ExecutarSimulacao(Supermercado *S);
-void EntradaPessoaSupermercado(Supermercado *S);
-int Supermercado_E_Para_Fechar(Supermercado *S);
-void DestruirSupermercado(Supermercado *S);
 
+ptSupermercado *CriarSupermercado(char *nome);
+int InicializarSupermercado(ptSupermercado s, char *nomeFicheiroConfig);
+int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios);
+int ObterFuncionarioLivre(ptSupermercado s);
+int AtribuirFuncionarioLivre(ptSupermercado s);
+void LiberarFuncionario(ptSupermercado s, int idFuncionario);
+int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
 
-#endif // SUPERMERCADO_H_INCLUDEDgg
+void MostrarFuncionarios(ptSupermercado s);
+int MostrarSupermercado(ptSupermercado s);
+
+int ExecutarSimulacao(ptSupermercado s);
+int Supermercado_E_Para_Fechar(ptSupermercado s);
+void DestruirSupermercado(ptSupermercado s);
+
+#endif

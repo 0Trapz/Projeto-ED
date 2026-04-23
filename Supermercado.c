@@ -1,35 +1,128 @@
 
 #include "Supermercado.h"
 
-extern int Aleatorio(int min, int max);
-
-//---------------------------------------------
 
 Supermercado *CriarSupermercado(char *nome)
 {
-    Supermercado *S = (Supermercado *)malloc(sizeof(Supermercado));
-    //... fazer
-    S->Rolex = CriarRelogio(10);
-    return S;
+    ptSupermercado s;
+    if(nome == NULL)
+    return NULL;
+    
+    s = (Supermercado *)malloc(sizeof(Supermercado));
+    if(s == NULL)
+    return NULL;
+
+    snprintf(s->nome, 50 + 1, "%s", nome);
+
+    s->relogio = NULL;  
+    s->clientesEmCompras = NULL;
+    s->produtosDisponiveis = NULL;
+    s->TotalProdutosDisponiveis = 0;
+
+    s->universoClientes.array = NULL;
+    s->universoClientes.total = 0;
+    s->proximoCliente = 0;
+
+    //s->caixas = NULL;
+
+    s->config.maxEspera = 0;
+    s->config.nCaixas = 0;
+    s->config.maxFila = 0;
+    s->config.minFila = 0;
+    s->config.tempoAtendimentoProduto = 0;
+    s->config.cadenciaEntradaClientes = 0;
+    s->config.horaAbertura = 0;
+    s->config.horaFecho = 0;
+
+    s->totalClientesAtendidos = 0;
+    s->totalProdutosVendidos = 0;
+    s->totalProdutosOferecidos = 0;
+
+    return s;
+
 }
-int InicializarSupermercado(Supermercado *S, char *config)
+int InicializarSupermercado(Supermercado *s, char *config)
 {
-    //... fazer
-    // S->HoraInicio = 8;
-    S->CadenciaEntradaClientes = 30;
-    return 1;
+    FILE *f;
+    int i;
+
+    if (s == NULL || config == NULL)
+        return 0;
+
+        f = fopen(config, "r");
+        if (f == NULL)
+        return 0;
+
+        if (fscanf(f, "%d", &s->config.maxEspera) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        if(scanf(f, "%d", &s->config.nCaixas) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        if (scanf(f, "%d", &s->config.maxFila) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        if (scanf(f, "%d", &s->config.minFila) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        if (scanf(f, "%d", &s->config.tempoAtendimentoProduto) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        if (fscanf(f, "%d", &s->config.cadenciaEntradaClientes) !=1){
+            fclose(f);
+            return 0;
+        }
+        if (fscanf(f, "%d", &s->config.horaAbertura) != 1){
+            fclose(f);
+            return 0;
+        }
+
+       if (fscanf(f, "%d", &s->config.horaFecho) != 1){
+            fclose(f);
+            return 0;
+        }
+
+        fclose(f);
+
+        s->relogio = CriarRelogio(s->config.horaAbertura, 0, 0);
+        if (s->relogio == NULL)
+        return 0;
+
+        /*s->caixas = (ptcaixa) malloc (sizeof(Caixa) * s->config.nCaixas);
+        if (s->caixas == NULL)
+        return 0;
+
+        for(i = 0; i< s-> config.nCaixas; i++){
+            s->caixas[i] = CriarCaixa(i+1);
+            if (s->caixas[i] == NULL)
+            return 0;
+        }
+        return 1;
+*/
+
+        
 }
-int ExecutarSimulacao(Supermercado *S)
+int ExecutarSimulacao(Supermercado *s)
 {
     printf("Estou a trabalhar...\n");
-    EntradaPessoaSupermercado(S);
+    EntradaPessoaSupermercado(s);
 
-    EstadoPagamentoIrCaixa(S);
+    EstadoPagamentoIrCaixa(s);
 
     return 1;
 }
 /*
-int IrCaixa(Pessoa *P, Supermercado *S)
+int IrCaixa(Pessoa *P, Supermercado *s)
 {
     //time_t T = GetTempo(S->Rolex);
     //Se (T >=  gfdglkfdglkfdg)
@@ -38,7 +131,7 @@ int IrCaixa(Pessoa *P, Supermercado *S)
 }
 */
 
-void EstadoPagamentoIrCaixa(Supermercado *S)
+void EstadoPagamentoIrCaixa(Supermercado *s)
 {
     //Para todas as Pessoas P da S->LClientes
     //    Se (IrCaixa(P, S))
@@ -47,7 +140,7 @@ void EstadoPagamentoIrCaixa(Supermercado *S)
             // e ir para o Hashing das Caixas
         }
 }
-void EntradaPessoaSupermercado(Supermercado *S)
+void EntradaPessoaSupermercado(Supermercado *s)
 {
     int X = Aleatorio(0, 100);
     //printf("X = %d\n", X);
@@ -60,14 +153,14 @@ void EntradaPessoaSupermercado(Supermercado *S)
     //---------------------
 }
 
-int Supermercado_E_Para_Fechar(Supermercado *S)
+int Supermercado_E_Para_Fechar(Supermercado *s
 {
         //... fazer
     return 0;
 }
 
-void DestruirSupermercado(Supermercado *S)
+void DestruirSupermercado(Supermercado *s)
 {
-    free(S->Rolex);
-    free(S);
+    free(s->relogio);
+    free(s);
 }
