@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// ------------------------------------------------------------------------------
 // Estrutura que representa um relógio
+// ------------------------------------------------------------------------------
 typedef struct 
 {
     int horas;
@@ -12,7 +14,9 @@ typedef struct
     int segundos;
 } Relogio, *ptRelogio; 
 
+// ------------------------------------------------------------------------------
 // Protótipos de funções
+// ------------------------------------------------------------------------------
 ptRelogio CriarRelogio(int h, int m, int s);
 void DestruirRelogio(ptRelogio r);
 void MostrarRelogio(ptRelogio r);
