@@ -40,9 +40,9 @@ Produto* CopiarProduto(Produto * p) {
     return CriarProduto(p->id, p->nome, p->preco, p->tempo_compra, p->tempo_caixa);
 }
 
-Produto* ObterProdutoMaisBarato(Lista *lista) {
+int ObterProdutoMaisBarato(Lista *lista) {
     if (!lista || lista->tamanho == 0){
-        return NULL;
+        return -1;
     }
 
     Produto *mais_barato = NULL;
