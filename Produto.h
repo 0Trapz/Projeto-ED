@@ -48,6 +48,6 @@ void DestruirProduto(Produto *p);
 Produto* CopiarProduto(Produto *p);
 
 // 4. Obter o produto mais barato da lista
-Produto* ObterProdutoMaisBarato(Lista *lista);
+int ObterProdutoMaisBarato(Lista *lista);
 
 #endif
