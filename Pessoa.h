@@ -63,6 +63,7 @@ void libertarPessoa(Pessoa *p);
 void adicionarClienteAtivo(NodoCliente **lista, Pessoa *cliente);
 void removerClienteAtivo(NodoCliente **lista, const char *id);
 void libertarListaClientesAtivos(NodoCliente **lista);
+Pessoa* procurarClienteAtivo(NodoCliente *ativos, const char *id);
 void adicionarClienteHistorico(NodoCliente **historico, Pessoa *cliente);
 void libertarListaClientesHistorico(NodoCliente **historico);
 void moverClienteParaHistorico(NodoCliente **ativos, NodoCliente **historico, const char *id);

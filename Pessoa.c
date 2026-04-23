@@ -119,6 +119,14 @@ void libertarListaClientesAtivos(NodoCliente **lista) {
     *lista = NULL;
 }
 
+Pessoa* procurarClienteAtivo(NodoCliente *ativos, const char *id) {
+    while (ativos) {
+        if (strcmp(ativos->cliente->id, id) == 0) return ativos->cliente;
+        ativos = ativos->prox;
+    }
+    return NULL;
+}
+
 void adicionarClienteHistorico(NodoCliente **historico, Pessoa *cliente) {
     if (!cliente) return;
     NodoCliente *novo = (NodoCliente *)malloc(sizeof(NodoCliente));
