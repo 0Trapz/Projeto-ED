@@ -3,7 +3,6 @@
 Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float tempo_caixa) {
     Produto *p = (Produto *)malloc(sizeof(Produto));
     if (!p) {
-        printf("Erro: Falha ao alocar memória para Produto\n");
         return NULL;
     }
 
@@ -12,7 +11,6 @@ Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float t
     //copiar nome
     p->nome = (char*)malloc(strlen(nome) + 1);
     if (!p->nome) {
-        printf("ERRO: Falha ao alocar memória para nome do produto\n");
         free(p);
         return NULL;
     }
