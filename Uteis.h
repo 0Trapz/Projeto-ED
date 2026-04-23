@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+// ------------------------------------------------------------------------------
 // Protótipos de funções
+// ------------------------------------------------------------------------------
 int Aleatorio(int min, int max);
 int LerInteiro(char *txt);
 char ToMaiscula(char x);

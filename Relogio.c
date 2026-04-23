@@ -49,7 +49,6 @@ int ObterSegundosRelogio(ptRelogio r){
 void AvancarRelogio(ptRelogio r, int segundos){
     int total;
     if(!r || segundos < 0) return;
-
     total = ObterSegundosRelogio(r);
     total += segundos;
     total = total % (24*3600);

@@ -6,9 +6,7 @@ Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float t
     if (!p) {
         return NULL;
     }
-
     p->id = id;
-
     //copiar nome
     p->nome = (char*)malloc(strlen(nome) + 1);
     if (!p->nome) {
@@ -16,11 +14,9 @@ Produto* CriarProduto(int id, char *nome, float preco, int tempo_compra, float t
         return NULL;
     }
     strcpy(p->nome, nome);
-
     p->preco = preco;
     p->tempo_compra = tempo_compra;
     p->tempo_caixa = tempo_caixa;
-
     return p;
 }
 
@@ -42,10 +38,8 @@ int ObterProdutoMaisBarato(Lista *lista) {
     if (!lista || lista->tamanho == 0){
         return -1;
     }
-
     Produto *mais_barato = NULL;
     float menor_preco = 999999.0;
-
     No *atual = lista->inicio;
     while (atual) {
         Produto *prod = (Produto *)atual->dados;
