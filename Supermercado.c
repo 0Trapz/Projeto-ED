@@ -90,7 +90,7 @@ int InicializarSupermercado(Supermercado *s, char *config)
         if (s->relogio == NULL)
         return 0;
 
-        s->caixas = (ptcaixa) malloc (sizeof(Caixa) * s->config.nCaixas);
+        /*s->caixas = (ptcaixa) malloc (sizeof(Caixa) * s->config.nCaixas);
         if (s->caixas == NULL)
         return 0;
 
@@ -100,7 +100,7 @@ int InicializarSupermercado(Supermercado *s, char *config)
             return 0;
         }
         return 1;
-
+*/
 
         
 }
@@ -153,6 +153,6 @@ int Supermercado_E_Para_Fechar(Supermercado *s
 
 void DestruirSupermercado(Supermercado *s)
 {
-    free(s->Rolex);
+    free(s->relogio);
     free(s);
 }
