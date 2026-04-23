@@ -26,8 +26,13 @@ typedef struct {
 
 // Estrutura para o universo de clientes (todos os clientes lidos do ficheiro)
 typedef struct {
+<<<<<<< HEAD
+    Pessoa* array;   // Array de pessoas
+    int total;       // Número total de pessoas
+=======
     Pessoa* array;    // Array de pessoas
     int total;        // Número total de pessoas
+>>>>>>> 627965d40c3152da5f43e8b2e786f84580ca7117
 } UniversoClientes;
 
 // Estrutura de lista ligada para clientes ativos no supermercado
