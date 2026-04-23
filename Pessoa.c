@@ -23,6 +23,7 @@ UniversoClientes carregarUniversoClientes(const char *ficheiro) {
             universo.array[idx].id[15] = '\0';
             strncpy(universo.array[idx].nome, nome, 127);
             universo.array[idx].nome[127] = '\0';
+            universo.array[idx].numProdutos = 0;
             universo.array[idx].totalGasto = 0;
             universo.array[idx].tempoCompra = 0;
             universo.array[idx].tempoCaixa = 0;
@@ -55,8 +56,14 @@ Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, P
     p->id[15] = '\0';
     strncpy(p->nome, origem->nome, 127);
     p->nome[127] = '\0';
-    // Sorteia produtos e calcula totais
-    SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, &p->totalGasto, (float*)&p->tempoCompra, (float*)&p->tempoCaixa);
+
+    // Sorteia produtos do universo e calcula caracteristicas desta ida do cliente
+    float tempoCompraF = 0.0f;
+    float tempoCaixaF = 0.0f;
+    p->numProdutos = SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, NULL, 0, &p->totalGasto, &tempoCompraF, &tempoCaixaF);
+    p->tempoCompra = (int)tempoCompraF;
+    p->tempoCaixa = (int)tempoCaixaF;
+
     // Desconta o produto mais barato
     Produto *maisBarato = ObterProdutoMaisBarato(produtosDisponiveis, totalProdutosDisponiveis);
     if (maisBarato) p->totalGasto -= maisBarato->preco;
@@ -147,11 +154,7 @@ void moverClienteParaHistorico(NodoCliente **ativos, NodoCliente **historico, co
         if (strcmp(atual->cliente->id, id) == 0) {
             if (anterior) anterior->prox = atual->prox;
             else *ativos = atual->prox;
-            atual->cliente->estado = 3; // Exemplo: 3 = histórico
-            // Atualizar também o universo de clientes (array principal)
-            // (Assumindo acesso global ou passagem do universo de clientes)
-            // Aqui só um comentário, pois depende do contexto de uso:
-            // atualizarUniversoClientes(atual->cliente);
+            atual->cliente->estado = 3; 
             adicionarClienteHistorico(historico, atual->cliente);
             free(atual);
             return;
@@ -192,7 +195,6 @@ void mostrarClienteAtivo(const Pessoa *p, NodoCliente *ativos) {
     if (!p) return;
     printf("ID: %s\n", p->id);
     printf("Nome: %s\n", p->nome);
-    // Não mostrar número de produtos, pois não é guardado
     printf("Total gasto: %.2f\n", p->totalGasto);
     printf("Tempo de compra: %d\n", p->tempoCompra);
     printf("Tempo de caixa: %d\n", p->tempoCaixa);

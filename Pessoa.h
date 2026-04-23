@@ -14,6 +14,7 @@
 typedef struct {
     char id[16];               // Identificador do cliente (ex: P1, P21)
     char nome[128];            // Nome do cliente
+    int numProdutos;           // Numero de produtos sorteados para a ida atual
     float totalGasto;          // Total gasto na ida atual
     int tempoCompra;           // Tempo de compra na ida atual
     int tempoCaixa;            // Tempo de caixa na ida atual

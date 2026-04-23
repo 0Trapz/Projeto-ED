@@ -1,4 +1,5 @@
 #include "Uteis.h"
+#include <string.h>
 
 // Gera um número aleatório entre min e max (inclusive)
 int Aleatorio(int min, int max) {

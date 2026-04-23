@@ -1,6 +1,8 @@
 #ifndef PRODUTO_H_INCLUDED
 #define PRODUTO_H_INCLUDED
 
+# define MAX_PRODUTOS_FICHEIRO 10000
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +14,7 @@
 // Estrutura que representa um produto no supermercado
 //------------------------------------------------------------------------------
 
+// Estrutura para armazenar informações sobre um produto
 typedef struct {
     int id;
     char nome[128];
@@ -27,8 +30,8 @@ typedef struct {
 // 1. Carregar produtos de ficheiro
 int CarregarProdutosDeFicheiro(const char *ficheiro, Produto *produtos, int maxProdutos);
 
-// 2. Sortear produtos para cliente
-void SortearProdutosParaCliente(const Produto *produtos, int totalProdutos, int quantidade, float *totalPreco, float *totalTempoCompra, float *totalTempoCaixa);
+// 2. Sortear X produtos para cliente e calcular totais
+int SortearProdutosParaCliente(const Produto *produtos, int totalProdutos, int quantidade, Produto *produtosCliente, int maxProdutosCliente, float *totalPreco, float *totalTempoCompra, float *totalTempoCaixa);
 
 // 3. Obter produto mais barato
 Produto* ObterProdutoMaisBarato(const Produto *produtos, int totalProdutos);
