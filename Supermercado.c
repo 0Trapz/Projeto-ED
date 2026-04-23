@@ -14,7 +14,15 @@ Supermercado *CriarSupermercado(char *nome)
 
     snprintf(s->nome, 50 + 1, "%s", nome);
 
-    s->relogio = NULL;
+    s->relogio = NULL;  
+    s->clientesEmCompras = NULL;
+    s->produtosDisponiveis = NULL;
+    s->TotalProdutosDisponiveis = 0;
+
+    s->universoClientes.array = NULL;
+    s->universoClientes.total = 0;
+    s->proximoCliente = 0;
+
     //s->caixas = NULL;
 
     s->config.maxEspera = 0;
