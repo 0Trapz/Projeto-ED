@@ -16,12 +16,13 @@ typedef struct {
     char nome[128];            // Nome do cliente
     int numProdutos;           // Numero de produtos sorteados para a ida atual
     float totalGasto;          // Total gasto na ida atual
-    int tempoCompra;           // Tempo de compra na ida atual
-    int tempoCaixa;            // Tempo de caixa na ida atual
+    float tempoCompra;           // Tempo de compra na ida atual
+    float tempoCaixa;            // Tempo de caixa na ida atual
     int estado;                // Estado do cliente (ex: 0 = compras, 1 = espera, 2 = atendimento, 3 = out, etc.)
     int countVezesIda;         // Contador de vezes que o cliente foi ao supermercado
-    int totalGastoHistorico;   // Total gasto acumulado em todas as idas ao supermercado
-    int totalTempoHistorico;   // Total de tempo gasto acumulado em todas as idas ao supermercado
+    float totalGastoHistorico;   // Total gasto acumulado em todas as idas ao supermercado
+    float totalTempoHistorico;   // Total de tempo gasto acumulado em todas as idas ao supermercado
+    int numTotalProdutoOferecido; // Total de produtos oferecidos acumulado em todas as idas ao supermercado
     // Outros campos úteis podem ser adicionados (ex: estado, tempo de espera, etc.)
 } Pessoa;
 

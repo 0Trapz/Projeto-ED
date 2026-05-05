@@ -29,6 +29,7 @@ UniversoClientes carregarUniversoClientes(const char *ficheiro) {
             universo.array[idx].tempoCaixa = 0;
             universo.array[idx].estado = 0;
             universo.array[idx].countVezesIda = 0;
+            universo.array[idx].totalGastoHistorico = 0;
             idx++;
         }
     }
