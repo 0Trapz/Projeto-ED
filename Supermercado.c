@@ -58,22 +58,22 @@ int InicializarSupermercado(Supermercado *s, char *config)
             return 0;
         }
 
-        if(scanf(f, "%d", &s->config.nCaixas) != 1){
+        if(fscanf(f, "%d", &s->config.nCaixas) != 1){
             fclose(f);
             return 0;
         }
 
-        if (scanf(f, "%d", &s->config.maxFila) != 1){
+        if (fscanf(f, "%d", &s->config.maxFila) != 1){
             fclose(f);
             return 0;
         }
 
-        if (scanf(f, "%d", &s->config.minFila) != 1){
+        if (fscanf(f, "%d", &s->config.minFila) != 1){
             fclose(f);
             return 0;
         }
 
-        if (scanf(f, "%d", &s->config.tempoAtendimentoProduto) != 1){
+        if (fscanf(f, "%d", &s->config.tempoAtendimentoProduto) != 1){
             fclose(f);
             return 0;
         }
@@ -111,6 +111,8 @@ int InicializarSupermercado(Supermercado *s, char *config)
 */
 
         
+    return 1;
+
 }
 int ExecutarSimulacao(Supermercado *s)
 {
@@ -119,6 +121,15 @@ int ExecutarSimulacao(Supermercado *s)
 
     EstadoPagamentoIrCaixa(s);
 
+    return 1;
+}
+
+int MostrarSupermercado(Supermercado *s)
+{
+    if (!s) return 0;
+    printf("Supermercado: %s\n", s->nome);
+    printf("Clientes em compras: %d\n", s->totalClientesAtendidos);
+    printf("Produtos disponiveis: %d\n", s->TotalProdutosDisponiveis);
     return 1;
 }
 /*
@@ -144,7 +155,7 @@ void EntradaPessoaSupermercado(Supermercado *s)
 {
     int X = Aleatorio(0, 100);
     //printf("X = %d\n", X);
-    if (X < S->CadenciaEntradaClientes)
+    if (X < s->config.cadenciaEntradaClientes)
     {
         //Pessoa *P = CriarPessoa();
         //AddLista(S->LCliente, P);
@@ -153,7 +164,7 @@ void EntradaPessoaSupermercado(Supermercado *s)
     //---------------------
 }
 
-int Supermercado_E_Para_Fechar(Supermercado *s
+int Supermercado_E_Para_Fechar(Supermercado *s)
 {
         //... fazer
     return 0;
