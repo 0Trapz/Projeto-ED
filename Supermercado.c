@@ -359,19 +359,20 @@ int MostrarSupermercado(ptSupermercado s)
 
 void EntradaPessoaSupermercado(ptSupermercado s){
     int x;
+    Pessoa *cliente;
     if (s == NULL) return;
 
     x = Aleatorio(0, 100);
-    if (x<s->config.cadenciaEntradaClientes)
+    if (x < s->config.cadenciaEntradaClientes)
     {
+        cliente = criarClienteAtivoDoUniverso(&s->universoClientes, s->proximoCliente, s->produtosDisponiveis, s->TotalProdutosDisponiveis, 3);
+        if (!cliente) return;
 
-    cliente = criarClienteAtivoDoUniverso(&s->universoClientes, s->proximoCliente, s->produtosDisponiveis, s->TotalProdutosDisponiveis, 3);
-    if (!cliente) return;
-
-    s->proximoCliente++;
-    AdicionarClienteAoSistema(s, cliente);
-    printf("Cliente %s entrou no supermercado.\n", cliente->id);
-}
+        s->proximoCliente++;
+        AdicionarClienteAoSistema(s, cliente);
+        printf("Cliente %s entrou no supermercado.\n", cliente->id);
+    }
+} 
 
 
 int ExecutarSimulacao(ptSupermercado s)
@@ -383,6 +384,7 @@ int ExecutarSimulacao(ptSupermercado s)
     DistribuirClientesParaCaixas(s);
 
     if (s->caixas != NULL) {
+        int i;
         for (i = 0; i < s->config.nCaixas; i++) {
             ProcessarCaixa(s, s->caixas[i]);
         }
