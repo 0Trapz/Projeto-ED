@@ -1,7 +1,28 @@
 
 #include "Supermercado.h"
 
-
+static void AplicarConfig(ptCONFIGURACAO config, char *chave, int valor)
+{
+    if (strcmp(chave, "MAX_ESPERA") == 0) {
+        config->maxEspera = valor;
+    } else if (strcmp(chave, "N_CAIXAS") == 0) {
+        config->nCaixas = valor;
+    } else if (strcmp(chave, "MAX_FILA") == 0) {
+        config->maxFila = valor;
+    } else if (strcmp(chave, "MIN_FILA") == 0) {
+        config->minFila = valor;
+    } else if (strcmp(chave, "TEMPO_ATENDIMENTO_PRODUTO") == 0) {
+        config->tempoAtendimentoProduto = valor;
+    } else if (strcmp(chave, "CADENCIA_ENTRADA_CLIENTES") == 0) {
+        config->cadenciaEntradaClientes = valor;
+    } else if (strcmp(chave, "HORA_ABERTURA") == 0) {
+        config->horaAbertura = valor;
+    } else if (strcmp(chave, "HORA_FECHO") == 0) {
+        config->horaFecho = valor;
+    } else if (strcmp(chave, "MAX_PRECO") == 0) {
+        config->maxPreco = valor;
+    }
+}
 
 Supermercado *CriarSupermercado(char *nome)
 {
@@ -16,6 +37,7 @@ Supermercado *CriarSupermercado(char *nome)
     return NULL;
 
     snprintf(s->nome, MAX_NOME_SUPERMERCADO + 1, "%s", nome);
+    memset(&s->config, 0, sizeof(CONFIGURACAO));
    
 
     s->relogio = NULL;  
@@ -53,12 +75,12 @@ int InicializarSupermercado(ptSupermercado s, char *config)
     if (s == NULL || config == NULL)
         return 0;
 
-        f = fopen(config, "r");
+    f = fopen(config, "r");
         if (f == NULL)
         return 0;
 
         while (fscanf(f, "%63s %d", chave, &valor) == 2){
-            aplicarConfig(&s->config, chave, valor);
+            AplicarConfig(&s->config, chave, valor);
         }
         
         
@@ -67,6 +89,8 @@ int InicializarSupermercado(ptSupermercado s, char *config)
         s->relogio = CriarRelogio(s->config.horaAbertura, 0, 0);
         if (s->relogio == NULL)
         return 0;
+
+        return 1;
 
 }
 
@@ -112,9 +136,10 @@ int AtribuirFuncionarioLivre(ptSupermercado s)
         s->funcionarioEmUso[indice] = 1; // Marcar como ocupado
         return indice;
     }
+    return -1; // Nenhum funcionário livre encontrado
     
 }
-void libertarFuncionario(ptSupermercado s, int indice)
+void LibertarFuncionario(ptSupermercado s, int indice)
 {
     if (s== NULL) return;
     if (indice <0 || indice >= s->totalFuncionarios) return;
@@ -135,7 +160,7 @@ void MostrarFuncionarios(ptSupermercado s)
 
     for (i=0; i <s->totalFuncionarios; i++)
     {
-        printf("ID: %d, Nome: %s, Em Uso: %s\n", i, s->funcionarios[i], s->funcionarioEmUso[i] ? "Sim" : "Não");
+        printf("ID: %d, Nome: %s, Em Uso: %s\n", s->idFuncionario[i], s->funcionarios[i], s->funcionarioEmUso[i] ? "Sim" : "Não");
     }
 }
 
@@ -202,7 +227,7 @@ void DestruirSupermercado(ptSupermercado s)
     
     if (s->caixas != NULL ){
         for (i=0; i < s->config.nCaixas; i++){
-            DestruirCaixa(&s->caixas[i]);
+            DestruirCaixa(s->caixas[i]);
         }free(s->caixas);
     }
 libertarListaClientesAtivos(&s->clientesEmCompras);
