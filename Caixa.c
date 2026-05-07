@@ -93,6 +93,20 @@ void AdicionarClienteFila(Caixa *c, Pessoa *cliente) {
     c->fila->tamanho++;
 }
 
+Pessoa* RemoverClienteFila(Caixa *c) {
+    if (!c || !c->fila || !c->fila->inicio) return NULL;
+
+    NoCaixa *primeiro = c->fila->inicio;
+    Pessoa *cliente = primeiro->cliente;
+    c->fila->inicio = primeiro->prox;
+    if (c->fila->inicio == NULL) {
+        c->fila->fim = NULL;
+    }
+    c->fila->tamanho--;
+    free(primeiro);
+    return cliente;
+}
+
 // Remover primeiro cliente da fila (muda estado 1→2)
 Pessoa* IniciarAtendimentoProximoCliente(Caixa *c) {
     if (!c || !c->fila || !c->fila->inicio) return NULL;
@@ -150,4 +164,61 @@ Pessoa* FinalizarAtendimentoCliente(Caixa *c) {
 Pessoa* ObterClienteEmAtendimento(Caixa *c) {
     if (!c) return NULL;
     return c->emAtendimento;
+}
+
+Caixa* CaixaComMenorFila(Caixa **caixas, int totalCaixas) {
+    Caixa *melhor = NULL;
+    int i;
+
+    if (!caixas || totalCaixas <= 0) return NULL;
+
+    for (i = 0; i < totalCaixas; i++) {
+        Caixa *atual = caixas[i];
+        if (!atual || !atual->ativa) continue;
+        if (!melhor || TamanhoDaFila(atual) < TamanhoDaFila(melhor)) {
+            melhor = atual;
+        }
+    }
+
+    return melhor;
+}
+
+Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas) {
+    int i;
+
+    if (!caixas || totalCaixas <= 0) return NULL;
+
+    for (i = 0; i < totalCaixas; i++) {
+        if (caixas[i] && caixas[i]->ativa == 0) {
+            caixas[i]->ativa = 1;
+            return caixas[i];
+        }
+    }
+
+    return NULL;
+}
+
+int ProcessarCaixa(Caixa *c, Pessoa **clienteFinalizado) {
+    if (clienteFinalizado) {
+        *clienteFinalizado = NULL;
+    }
+
+    if (!c || !c->ativa) return 0;
+
+    if (!ObterClienteEmAtendimento(c)) {
+        IniciarAtendimentoProximoCliente(c);
+    }
+
+    if (ObterClienteEmAtendimento(c)) {
+        IncrementarTempoAtendimento(c);
+        if (c->emAtendimento && c->tempoAtendimentoDecorrido >= (int)c->emAtendimento->tempoCaixa) {
+            Pessoa *cliente = FinalizarAtendimentoCliente(c);
+            if (clienteFinalizado) {
+                *clienteFinalizado = cliente;
+            }
+            return 1;
+        }
+    }
+
+    return 0;
 }

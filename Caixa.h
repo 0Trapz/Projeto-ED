@@ -50,6 +50,10 @@ void DestruirCaixa(Caixa *c);
 
 // Funções de atendimento
 void AdicionarClienteFila(Caixa *c, Pessoa *cliente); //muda estado de 0->1
+Pessoa* RemoverClienteFila(Caixa *c);
+Caixa* CaixaComMenorFila(Caixa **caixas, int totalCaixas);
+Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas);
+int ProcessarCaixa(Caixa *c, Pessoa **clienteFinalizado);
 
 // Retorna cliente que passou para atendimento (estado 2) ou NULL se não houver
 Pessoa* IniciarAtendimentoProximoCliente(Caixa *c); //muda estado de 1->2
