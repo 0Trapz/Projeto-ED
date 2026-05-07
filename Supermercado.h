@@ -22,7 +22,8 @@ typedef struct
     int tempoAtendimentoProduto;
     int cadenciaEntradaClientes;
     int horaAbertura;
-    int horaFecho;    
+    int horaFecho;   
+    int maxPreco;
 } CONFIGURACAO, *ptCONFIGURACAO;
 
 typedef struct
@@ -62,7 +63,7 @@ int InicializarSupermercado(ptSupermercado s, char *nomeFicheiroConfig);
 int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios);
 int ObterFuncionarioLivre(ptSupermercado s);
 int AtribuirFuncionarioLivre(ptSupermercado s);
-void LiberarFuncionario(ptSupermercado s, int idFuncionario);
+void LibertarFuncionario(ptSupermercado s, int idFuncionario);
 int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
 
 void EstadoPagamentoIrCaixa(ptSupermercado s);
