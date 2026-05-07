@@ -91,7 +91,7 @@ int InicializarSupermercado(ptSupermercado s, char *config)
     s->relogio = CriarRelogio(s->config.horaAbertura, 0, 0);
     if (s->relogio == NULL) {
         return 0;
-
+    }
         return 1;
 
 }
