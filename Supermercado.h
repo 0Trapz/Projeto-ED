@@ -7,7 +7,7 @@
 
 #include "Pessoa.h"
 #include "Relogio.h"
-//#include "Caixa.h"
+#include "Caixa.h"
 
 #define MAX_NOME_SUPERMERCADO 50
 #define MAX_FUNCIONARIOS 100
@@ -23,8 +23,6 @@ typedef struct
     int cadenciaEntradaClientes;
     int horaAbertura;
     int horaFecho;    
-    int CadenciaEntradaClientes;
-    Relogio *relogio;
 } CONFIGURACAO, *ptCONFIGURACAO;
 
 typedef struct
@@ -35,7 +33,7 @@ typedef struct
     Produto *produtosDisponiveis;
     int TotalProdutosDisponiveis;
     UniversoClientes universoClientes;
-    Pessoa *clientesUniverso;
+    
     int proximoCliente;
 
     NodoCliente *clientesEmCompras;
@@ -43,8 +41,9 @@ typedef struct
     char funcionarios[MAX_FUNCIONARIOS][MAX_NOME_FUNCIONARIO + 1];
     int funcionarioEmUso[MAX_FUNCIONARIOS];
     int totalFuncionarios;
+    int idFuncionario[MAX_FUNCIONARIOS];
 
-    //ptCaixa caixas;
+    Caixa **caixas;
 
     int totalClientesAtendidos;
     int totalProdutosVendidos;
@@ -65,7 +64,6 @@ int AtribuirFuncionarioLivre(ptSupermercado s);
 void LiberarFuncionario(ptSupermercado s, int idFuncionario);
 int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
 
-void EntradaPessoaSupermercado(ptSupermercado s);
 void EstadoPagamentoIrCaixa(ptSupermercado s);
 
 void MostrarFuncionarios(ptSupermercado s);
@@ -74,5 +72,6 @@ int MostrarSupermercado(ptSupermercado s);
 int ExecutarSimulacao(ptSupermercado s);
 int Supermercado_E_Para_Fechar(ptSupermercado s);
 void DestruirSupermercado(ptSupermercado s);
+void EntradaPessoaSupermercado(ptSupermercado s);
 
 #endif
