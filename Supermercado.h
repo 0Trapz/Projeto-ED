@@ -35,7 +35,7 @@ typedef struct
     Produto *produtosDisponiveis;
     int TotalProdutosDisponiveis;
     UniversoClientes universoClientes;
-    Pessoa *universoClientes;
+    Pessoa *clientesUniverso;
     int proximoCliente;
 
     NodoCliente *clientesEmCompras;
@@ -57,13 +57,16 @@ typedef struct
 } Supermercado, *ptSupermercado;
 
 
-ptSupermercado *CriarSupermercado(char *nome);
+ptSupermercado CriarSupermercado(char *nome);
 int InicializarSupermercado(ptSupermercado s, char *nomeFicheiroConfig);
 int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios);
 int ObterFuncionarioLivre(ptSupermercado s);
 int AtribuirFuncionarioLivre(ptSupermercado s);
 void LiberarFuncionario(ptSupermercado s, int idFuncionario);
 int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
+
+void EntradaPessoaSupermercado(ptSupermercado s);
+void EstadoPagamentoIrCaixa(ptSupermercado s);
 
 void MostrarFuncionarios(ptSupermercado s);
 int MostrarSupermercado(ptSupermercado s);

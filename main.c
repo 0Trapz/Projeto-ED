@@ -3,24 +3,33 @@
 #include <time.h>
 
 #include "Supermercado.h"
-
-extern void wait_segundos ( int seconds );
-extern int LerInteiro(char *txt);
+#include "Uteis.h"
 
 int Menu()
 {
+    printf("0 - Sair\n");
     printf("1 - Listar\n");
-    //-------
+    printf("2 - Mostrar supermercado\n");
     int OP = LerInteiro("Qual a Opcao ?");
     return OP;
 }
 void ExecutaAccoesMenu(Supermercado *S)
 {
+    if (!S) return;
+
     int OP = Menu();
     switch(OP)
     {
-        case 1: //ListarCliente(S->LCientes); break;
+        case 1:
+            printf("Funcionalidade de listar clientes ainda por concluir.\n");
+            break;
+        case 2:
+            MostrarSupermercado(S);
+            break;
         case 0: break;
+        default:
+            printf("Opcao invalida.\n");
+            break;
     }
 
 }
@@ -29,8 +38,18 @@ int main()
 {
     printf("Projeto ED - 25-26!\n");
     srand(time(NULL));
-    Supermercado *Lidl = CriarSupermercado("Lidal");
-    InicializarSupermercado(Lidl, "config.txt");
+    Supermercado *Lidl = CriarSupermercado("Lidl");
+    if (!Lidl) {
+        printf("Erro a criar o supermercado.\n");
+        return 1;
+    }
+
+    if (!InicializarSupermercado(Lidl, "config.txt")) {
+        printf("Erro a inicializar o supermercado.\n");
+        DestruirSupermercado(Lidl);
+        return 1;
+    }
+
     int Terminar = 0;
     while (!Terminar)
     {
