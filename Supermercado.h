@@ -65,6 +65,8 @@ int AtribuirFuncionarioLivre(ptSupermercado s);
 void LibertarFuncionario(ptSupermercado s, int idFuncionario);
 int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
 
+void EstadoPagamentoIrCaixa(ptSupermercado s);
+
 void MostrarFuncionarios(ptSupermercado s);
 int MostrarSupermercado(ptSupermercado s);
 

@@ -1,4 +1,3 @@
-
 #include "Supermercado.h"
 
 static void AplicarConfig(ptCONFIGURACAO config, char *chave, int valor)
@@ -37,6 +36,7 @@ Supermercado *CriarSupermercado(char *nome)
     return NULL;
 
     snprintf(s->nome, MAX_NOME_SUPERMERCADO + 1, "%s", nome);
+    memset(&s->config, 0, sizeof(CONFIGURACAO));
     memset(&s->config, 0, sizeof(CONFIGURACAO));
    
 

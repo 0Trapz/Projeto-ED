@@ -11,25 +11,27 @@ UniversoClientes carregarUniversoClientes(const char *ficheiro) {
     // Conta linhas para alocar array
     int total = 0;
     char linha[256];
-    while (LerLinha(linha, sizeof(linha))) total++;
+    while (LerLinhaFicheiro(f, linha, sizeof(linha))) total++;
     rewind(f);
     universo.array = (Pessoa*)calloc(total, sizeof(Pessoa));
     universo.total = total;
     int idx = 0;
-    while (LerLinha(linha, sizeof(linha)) && idx < total) {
+    while (LerLinhaFicheiro(f, linha, sizeof(linha)) && idx < total) {
         char id[16], nome[128];
-        if (sscanf(linha, "%15s %[^]", id, nome) == 2) {
+        if (sscanf(linha, "%15s %[^\n]", id, nome) == 2) {
             strncpy(universo.array[idx].id, id, 15);
             universo.array[idx].id[15] = '\0';
             strncpy(universo.array[idx].nome, nome, 127);
             universo.array[idx].nome[127] = '\0';
             universo.array[idx].numProdutos = 0;
-            universo.array[idx].totalGasto = 0;
-            universo.array[idx].tempoCompra = 0;
-            universo.array[idx].tempoCaixa = 0;
+            universo.array[idx].totalGasto = 0.0f;
+            universo.array[idx].tempoCompra = 0.0f;
+            universo.array[idx].tempoCaixa = 0.0f;
             universo.array[idx].estado = 0;
             universo.array[idx].countVezesIda = 0;
-            universo.array[idx].totalGastoHistorico = 0;
+            universo.array[idx].totalGastoHistorico = 0.0f;
+            universo.array[idx].totalTempoHistorico = 0.0f;
+            universo.array[idx].numTotalProdutoOferecido = 0;
             idx++;
         }
     }
@@ -62,8 +64,8 @@ Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, P
     float tempoCompraF = 0.0f;
     float tempoCaixaF = 0.0f;
     p->numProdutos = SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, NULL, 0, &p->totalGasto, &tempoCompraF, &tempoCaixaF);
-    p->tempoCompra = (int)tempoCompraF;
-    p->tempoCaixa = (int)tempoCaixaF;
+    p->tempoCompra = tempoCompraF;
+    p->tempoCaixa = tempoCaixaF;
 
     // Desconta o produto mais barato
     Produto *maisBarato = ObterProdutoMaisBarato(produtosDisponiveis, totalProdutosDisponiveis);
@@ -194,22 +196,24 @@ void removerClienteHistorico(NodoCliente **historico, const char *id) {
 //------------------------------------------------------------------------------
 void mostrarClienteAtivo(const Pessoa *p, NodoCliente *ativos) {
     if (!p) return;
+    (void)ativos;
     printf("ID: %s\n", p->id);
     printf("Nome: %s\n", p->nome);
     printf("Total gasto: %.2f\n", p->totalGasto);
-    printf("Tempo de compra: %d\n", p->tempoCompra);
-    printf("Tempo de caixa: %d\n", p->tempoCaixa);
+    printf("Tempo de compra: %.2f\n", p->tempoCompra);
+    printf("Tempo de caixa: %.2f\n", p->tempoCaixa);
     printf("Estado: %d\n", p->estado);
     printf("Entradas: %d\n", p->countVezesIda);
 }
 
 void mostrarClienteHistorico(const Pessoa *p, NodoClienteHistorico *historico) {
     if (!p) return;
+    (void)historico;
     printf("ID: %s\n", p->id);
     printf("Nome: %s\n", p->nome);
     printf("Total gasto: %.2f\n", p->totalGastoHistorico);
-    printf("Tempo de compra: %d\n", p->tempoCompra);
-    printf("Tempo de caixa: %d\n", p->tempoCaixa);
+    printf("Tempo de compra: %.2f\n", p->tempoCompra);
+    printf("Tempo de caixa: %.2f\n", p->tempoCaixa);
     printf("Estado: %d\n", p->estado);
     printf("Entradas: %d\n", p->countVezesIda);
 }
@@ -221,6 +225,6 @@ void registarAcaoCSV(const char *ficheiro, const char *acao, const Pessoa *clien
     if (!ficheiro || !acao || !cliente) return;
     FILE *f = fopen(ficheiro, "a");
     if (!f) return;
-    fprintf(f, "%s;%s;%s;%d;%d;%.2f;%d;%d\n", acao, cliente->id, cliente->nome, cliente->estado, cliente->estado, cliente->totalGasto, cliente->tempoCompra, cliente->tempoCaixa);
+    fprintf(f, "%s;%s;%s;%d;%d;%.2f;%.2f;%.2f\n", acao, cliente->id, cliente->nome, cliente->estado, cliente->estado, cliente->totalGasto, cliente->tempoCompra, cliente->tempoCaixa);
     fclose(f);
 }
