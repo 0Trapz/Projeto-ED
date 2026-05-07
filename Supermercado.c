@@ -16,7 +16,7 @@ Supermercado *CriarSupermercado(char *nome)
     return NULL;
 
     snprintf(s->nome, MAX_NOME_SUPERMERCADO + 1, "%s", nome);
-    InicializarConfig(&s->config);
+   
 
     s->relogio = NULL;  
     s->clientesEmCompras = NULL;
@@ -36,14 +36,6 @@ Supermercado *CriarSupermercado(char *nome)
         s->funcionarios[i][0] = '\0';
     }
 
-    s->config.maxEspera = 0;
-    s->config.nCaixas = 0;
-    s->config.maxFila = 0;
-    s->config.minFila = 0;
-    s->config.tempoAtendimentoProduto = 0;
-    s->config.cadenciaEntradaClientes = 0;
-    s->config.horaAbertura = 0;
-    s->config.horaFecho = 0;
 
     s->totalClientesAtendidos = 0;
     s->totalProdutosVendidos = 0;
