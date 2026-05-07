@@ -37,11 +37,11 @@ Supermercado *CriarSupermercado(char *nome)
 
     snprintf(s->nome, MAX_NOME_SUPERMERCADO + 1, "%s", nome);
     memset(&s->config, 0, sizeof(CONFIGURACAO));
-    memset(&s->config, 0, sizeof(CONFIGURACAO));
    
 
     s->relogio = NULL;  
     s->clientesEmCompras = NULL;
+    s->clientesHistorico = NULL;
     s->produtosDisponiveis = NULL;
     s->TotalProdutosDisponiveis = 0;
 
@@ -56,12 +56,16 @@ Supermercado *CriarSupermercado(char *nome)
     {
         s->funcionarioEmUso[i] = 0;
         s->funcionarios[i][0] = '\0';
+        s->idFuncionario[i] = -1;
     }
 
 
     s->totalClientesAtendidos = 0;
     s->totalProdutosVendidos = 0;
     s->totalProdutosOferecidos = 0;
+    s->custoTotalOfertas = 0.0f;
+    s->tempoTotalEspera = 0;
+    s->numeroTotalEsperas = 0;
 
     return s;
 
@@ -105,7 +109,7 @@ int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios){
     if (f == NULL)
         return 0;
 
-        s->totalFuncionarios = 0;
+    s->totalFuncionarios = 0;
 
     while (s->totalFuncionarios < MAX_FUNCIONARIOS && fscanf(f, "%d %80[^\n]", &id, nome) == 2) {
         s->idFuncionario[s->totalFuncionarios] = id;
@@ -182,40 +186,6 @@ int InicializarCaixasSupermercado(ptSupermercado s)
     return 1;
 }
 
-static Caixa *ObterCaixaComMenorFila(ptSupermercado s)
-{
-    Caixa *melhor = NULL;
-    int i;
-
-    if (!s || !s->caixas) return NULL;
-
-    for (i = 0; i < s->config.nCaixas; i++) {
-        Caixa *atual = s->caixas[i];
-        if (!atual) continue;
-        if (!melhor || (atual->ativa && TamanhoDaFila(atual) < TamanhoDaFila(melhor))) {
-            melhor = atual;
-        }
-    }
-
-    return melhor;
-}
-
-static Caixa *AtivarProximaCaixaSePreciso(ptSupermercado s)
-{
-    int i;
-
-    if (!s || !s->caixas) return NULL;
-
-    for (i = 0; i < s->config.nCaixas; i++) {
-        if (s->caixas[i] && s->caixas[i]->ativa == 0) {
-            s->caixas[i]->ativa = 1;
-            return s->caixas[i];
-        }
-    }
-
-    return NULL;
-}
-
 static void AdicionarClienteAoSistema(ptSupermercado s, Pessoa *cliente)
 {
     if (!s || !cliente) return;
@@ -231,49 +201,23 @@ static void DistribuirClientesParaCaixas(ptSupermercado s)
     if (!s) return;
 
     while (s->clientesEmCompras) {
-        caixa = ObterCaixaComMenorFila(s);
-        if (!caixa) return;
+        caixa = CaixaComMenorFila(s->caixas, s->config.nCaixas);
 
-        if (caixa->ativa == 0) {
-            caixa = AtivarProximaCaixaSePreciso(s);
+        if (!caixa) {
+            caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
             if (!caixa) return;
         }
 
         if (TamanhoDaFila(caixa) >= s->config.maxFila) {
-            caixa = AtivarProximaCaixaSePreciso(s);
-            if (!caixa) return;
+            Caixa *novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+            if (novaCaixa) {
+                caixa = novaCaixa;
+            }
         }
 
         cliente = RemoverPrimeiroCliente(&s->clientesEmCompras);
         if (!cliente) return;
         AdicionarClienteFila(caixa, cliente);
-    }
-}
-
-static void ProcessarCaixa(ptSupermercado s, Caixa *caixa)
-{
-    Pessoa *clienteFinalizado;
-
-    if (!s || !caixa || !caixa->ativa) return;
-
-    if (!ObterClienteEmAtendimento(caixa)) {
-        IniciarAtendimentoProximoCliente(caixa);
-    }
-
-    if (ObterClienteEmAtendimento(caixa)) {
-        IncrementarTempoAtendimento(caixa);
-        if (caixa->emAtendimento && caixa->tempoAtendimentoDecorrido >= (int)caixa->emAtendimento->tempoCaixa) {
-            clienteFinalizado = FinalizarAtendimentoCliente(caixa);
-            if (clienteFinalizado) {
-                s->totalClientesAtendidos++;
-                s->totalProdutosVendidos += clienteFinalizado->numProdutos;
-                s->totalProdutosOferecidos += 1;
-                s->custoTotalOfertas += clienteFinalizado->totalGasto;
-                clienteFinalizado->totalGastoHistorico += clienteFinalizado->totalGasto;
-                clienteFinalizado->totalTempoHistorico += clienteFinalizado->tempoCompra + clienteFinalizado->tempoCaixa;
-                adicionarClienteHistorico(&s->clientesHistorico, clienteFinalizado);
-            }
-        }
     }
 }
 
@@ -386,7 +330,15 @@ int ExecutarSimulacao(ptSupermercado s)
     if (s->caixas != NULL) {
         int i;
         for (i = 0; i < s->config.nCaixas; i++) {
-            ProcessarCaixa(s, s->caixas[i]);
+            Pessoa *clienteFinalizado = NULL;
+
+            if (ProcessarCaixa(s->caixas[i], &clienteFinalizado) && clienteFinalizado != NULL) {
+                s->totalClientesAtendidos++;
+                s->totalProdutosVendidos += clienteFinalizado->numProdutos;
+                clienteFinalizado->totalGastoHistorico += clienteFinalizado->totalGasto;
+                clienteFinalizado->totalTempoHistorico += clienteFinalizado->tempoCompra + clienteFinalizado->tempoCaixa;
+                adicionarClienteHistorico(&s->clientesHistorico, clienteFinalizado);
+            }
         }
     }
 
@@ -417,11 +369,15 @@ void DestruirSupermercado(ptSupermercado s)
     if (s->caixas != NULL ){
         for (i=0; i < s->config.nCaixas; i++){
             DestruirCaixa(s->caixas[i]);
-        }free(s->caixas);
+        }
+        free(s->caixas);
     }
-libertarListaClientesAtivos(&s->clientesEmCompras);
-libertarUniversoClientes(&s->universoClientes);
+    if (s->produtosDisponiveis != NULL)
+        free(s->produtosDisponiveis);
+    libertarListaClientesAtivos(&s->clientesEmCompras);
+    libertarListaClientesHistorico(&s->clientesHistorico);
+    libertarUniversoClientes(&s->universoClientes);
 
-free(s);
+    free(s);
 
 }
