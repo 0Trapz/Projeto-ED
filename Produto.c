@@ -1,6 +1,6 @@
 #include "Produto.h"
 
-// 1. Carregar produtos de ficheiro
+// Carregar produtos de ficheiro
 int CarregarProdutosDeFicheiro(const char *ficheiro, Produto *produtos, int maxProdutos) {
     if (!ficheiro || !produtos || maxProdutos <= 0) return 0;
     FILE *f = fopen(ficheiro, "r");
@@ -27,7 +27,7 @@ int CarregarProdutosDeFicheiro(const char *ficheiro, Produto *produtos, int maxP
     return total;
 }
 
-// 2. Sorteia X produtos aleatórios para o cliente e calcula totais
+// Sorteia X produtos aleatórios para o cliente e calcula totais
 int SortearProdutosParaCliente(const Produto *produtos, int totalProdutos, int quantidade, Produto *produtosCliente, int maxProdutosCliente, float *totalPreco, float *totalTempoCompra, float *totalTempoCaixa) {
     if (totalPreco) *totalPreco = 0;
     if (totalTempoCompra) *totalTempoCompra = 0;
@@ -54,7 +54,7 @@ int SortearProdutosParaCliente(const Produto *produtos, int totalProdutos, int q
     return sorteados;
 }
 
-// 3. Obter produto mais barato
+// Obter produto mais barato
 Produto* ObterProdutoMaisBarato(const Produto *produtos, int totalProdutos) {
     if (!produtos || totalProdutos <= 0) return NULL;
     Produto *mais_barato = (Produto*)&produtos[0];
@@ -66,7 +66,7 @@ Produto* ObterProdutoMaisBarato(const Produto *produtos, int totalProdutos) {
     return mais_barato;
 }
 
-// 4. Obter produto aleatório
+// Obter produto aleatório
 Produto* ObterProdutoAleatorio(const Produto *produtos, int totalProdutos) {
     if (!produtos || totalProdutos <= 0) return NULL;
     int idx = Aleatorio(0, totalProdutos - 1);

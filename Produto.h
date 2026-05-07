@@ -27,16 +27,16 @@ typedef struct {
 // Protótipos de funções
 //------------------------------------------------------------------------------
 
-// 1. Carregar produtos de ficheiro
+// Carregar produtos de ficheiro
 int CarregarProdutosDeFicheiro(const char *ficheiro, Produto *produtos, int maxProdutos);
 
-// 2. Sortear X produtos para cliente e calcular totais
+// Sortear X produtos para cliente e calcular totais
 int SortearProdutosParaCliente(const Produto *produtos, int totalProdutos, int quantidade, Produto *produtosCliente, int maxProdutosCliente, float *totalPreco, float *totalTempoCompra, float *totalTempoCaixa);
 
-// 3. Obter produto mais barato
+// Obter produto mais barato
 Produto* ObterProdutoMaisBarato(const Produto *produtos, int totalProdutos);
 
-// 4. Obter produto aleatório
+// Obter produto aleatório
 Produto* ObterProdutoAleatorio(const Produto *produtos, int totalProdutos);
 
 #endif

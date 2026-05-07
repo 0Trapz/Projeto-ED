@@ -6,24 +6,25 @@
 #include <string.h>
 #include "Pessoa.h"
 
-//estrutura para um no de uma caixa
+//------------------------------------------------------------------------------
+// Estruturas
+//------------------------------------------------------------------------------
 
+// Estrutura para um no de uma caixa
 typedef struct NoCaixa {
     Pessoa *cliente; //ponteiro para Pessoa em UniversoClientes
     int tempoAtendimentoDecorrido; //tempo ja passado
     struct NoCaixa *prox; 
 } NoCaixa;
 
-//fila de clientes da caixa
-
+// Fila de clientes da caixa
 typedef struct {
     NoCaixa *inicio; // Primeiro da fila
     NoCaixa *fim; // Último da fila
     int tamanho; // Número de pessoas na fila
 } FilaCaixa;
 
-//estrutura da caixa
-
+//Estrutura da caixa
 typedef struct{
     int id;
     char *operador;
@@ -36,22 +37,32 @@ typedef struct{
     float revenue; //receita total da caixa
 } Caixa;
 
-//funções
+//------------------------------------------------------------------------------
+// Protótipos de funções
+// ------------------------------------------------------------------------------
 
+// Funçao de criação de caixa
 Caixa* CriarCaixa(int id, const char *operador,int operadorID);
 
+// Função de destruição de caixa (liberta fila, mas não clientes)
 void DestruirCaixa(Caixa *c);
 
+// Funções de atendimento
 void AdicionarClienteFila(Caixa *c, Pessoa *cliente); //muda estado de 0->1
 
+// Retorna cliente que passou para atendimento (estado 2) ou NULL se não houver
 Pessoa* IniciarAtendimentoProximoCliente(Caixa *c); //muda estado de 1->2
 
+// Retorna cliente que finalizou atendimento (estado 3) ou NULL se não houver
 int TamanhoDaFila(Caixa *c);
 
+// Incrementa tempo de atendimento do cliente em estado 2 (em atendimento)
 void IncrementarTempoAtendimento(Caixa *c); //incrementar tempo de atendimento do cliente no estado 2
 
+// Retorna cliente que finalizou atendimento (estado 3) ou NULL se não houver
 Pessoa*FinalizarAtendimentoCliente(Caixa *c); //muda estado de 2->3
 
+// Retorna cliente que está em atendimento (estado 2) ou NULL se não houver
 Pessoa* ObterClienteEmAtendimento(Caixa *c);
 
 #endif
