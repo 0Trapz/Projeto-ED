@@ -37,7 +37,7 @@ Supermercado *CriarSupermercado(char *nome)
 
     snprintf(s->nome, MAX_NOME_SUPERMERCADO + 1, "%s", nome);
     memset(&s->config, 0, sizeof(CONFIGURACAO));
-    memset(&s->config, 0, sizeof(CONFIGURACAO));
+    
    
 
     s->relogio = NULL;  
