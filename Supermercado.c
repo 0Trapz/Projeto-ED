@@ -85,16 +85,15 @@ int InicializarSupermercado(ptSupermercado s, char *config){
         
         fclose(f);
 
-        s->relogio = CriarRelogio(s->config.horaAbertura, 0, 0);
-        if (s->relogio == NULL){
-               return 0;
-        }
+    s->relogio = CriarRelogio(s->config.horaAbertura, 0, 0);
+    if (s->relogio == NULL) {
+        return 0;
+    }
         return 1;
 
 }
 
-int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios)
-{
+int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios){
     FILE *f;
     char nome[MAX_NOME_FUNCIONARIO + 1];
     int id;
