@@ -44,6 +44,7 @@ typedef struct
     int idFuncionario[MAX_FUNCIONARIOS];
 
     Caixa **caixas;
+    NodoCliente *clientesHistorico;
 
     int totalClientesAtendidos;
     int totalProdutosVendidos;
@@ -73,5 +74,6 @@ int ExecutarSimulacao(ptSupermercado s);
 int Supermercado_E_Para_Fechar(ptSupermercado s);
 void DestruirSupermercado(ptSupermercado s);
 void EntradaPessoaSupermercado(ptSupermercado s);
+int InicializarCaixasSupermercado(ptSupermercado s);
 
 #endif

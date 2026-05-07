@@ -39,6 +39,7 @@ Caixa* CriarCaixa(int id, const char *operador, int operadorID) {
     c->fila->tamanho = 0;
     
     c->emAtendimento = NULL;
+    c->tempoAtendimentoDecorrido = 0;
     c->ativa = 1;
     c->clientesAtendidos = 0;
     c->produtosVendidos = 0;
@@ -108,6 +109,7 @@ Pessoa* IniciarAtendimentoProximoCliente(Caixa *c) {
         // Muda estado de 1 (fila) para 2 (em atendimento)
         cliente->estado = 2;
         c->emAtendimento = cliente;
+        c->tempoAtendimentoDecorrido = 0;
     }
     // Liberta nodo (pessoa continua viva!)
     free(primeiro);
@@ -123,7 +125,7 @@ int TamanhoDaFila(Caixa *c) {
 // Incrementar tempo de atendimento
 void IncrementarTempoAtendimento(Caixa *c) {
     if (!c || !c->emAtendimento) return;
-    // Incrementa tempo decorrido do cliente em atendimento
+    c->tempoAtendimentoDecorrido++;
 }
 
 // Finalizar atendimento (muda estado 2→3)
@@ -140,6 +142,7 @@ Pessoa* FinalizarAtendimentoCliente(Caixa *c) {
     }
     // Limpa referência (pessoa continua viva!)
     c->emAtendimento = NULL;
+    c->tempoAtendimentoDecorrido = 0;
     return cliente;
 }
 

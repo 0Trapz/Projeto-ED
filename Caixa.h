@@ -31,6 +31,7 @@ typedef struct{
     int operadorID;
     FilaCaixa *fila;
     Pessoa *emAtendimento; //clientes em estado 1 ou 2
+    int tempoAtendimentoDecorrido;
     int ativa; //1 = aberta e 2 = fechada
     int clientesAtendidos;
     int produtosVendidos;

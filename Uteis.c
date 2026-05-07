@@ -33,11 +33,17 @@ void wait_segundos ( int seconds ) {
     wait(seconds * CLOCKS_PER_SEC);
 }
 
-// Função para esperar o utilizador pressionar Enter
+// Verifica se há uma tecla pendente sem bloquear o ciclo principal
 int TeclaPressionada() {
-    printf("Pressione Enter para continuar...\n");
-    while (getchar() != '\n');
-    return 0;
+    if (!_kbhit()) {
+        return 0;
+    }
+
+    while (_kbhit()) {
+        (void)_getch();
+    }
+
+    return 1;
 }
 
 // Função utilitária para ler uma linha de um ficheiro para buffer, removendo '\n'/'\r\n'.

@@ -6,14 +6,40 @@ int CarregarProdutosDeFicheiro(const char *ficheiro, Produto *produtos, int maxP
     FILE *f = fopen(ficheiro, "r");
     if (!f) return 0;
     char linha[512];
-    char nome[128];
+    char resto[384];
+    char *nome;
+    char *fim;
     int id;
     float preco, tempo_compra, tempo_caixa;
     int total = 0;
     int limite = maxProdutos;
     if (limite > MAX_PRODUTOS_FICHEIRO) limite = MAX_PRODUTOS_FICHEIRO;
-   while (total < limite && LerLinhaFicheiro(f, linha, sizeof(linha))) {
-        if (sscanf(linha, "%d %127s %f %f %f", &id, nome, &preco, &tempo_compra, &tempo_caixa) == 5) {
+    while (total < limite && LerLinhaFicheiro(f, linha, sizeof(linha))) {
+        char *primeiroEspaco;
+
+        if (sscanf(linha, "%d %[^\n]", &id, resto) != 2) {
+            continue;
+        }
+
+        primeiroEspaco = strrchr(resto, ' ');
+        if (!primeiroEspaco) continue;
+        tempo_caixa = strtof(primeiroEspaco + 1, &fim);
+        *primeiroEspaco = '\0';
+
+        primeiroEspaco = strrchr(resto, ' ');
+        if (!primeiroEspaco) continue;
+        tempo_compra = strtof(primeiroEspaco + 1, &fim);
+        *primeiroEspaco = '\0';
+
+        primeiroEspaco = strrchr(resto, ' ');
+        if (!primeiroEspaco) continue;
+        preco = strtof(primeiroEspaco + 1, &fim);
+        *primeiroEspaco = '\0';
+
+        nome = resto;
+        while (*nome == ' ' || *nome == '\t') nome++;
+
+        if (*nome != '\0') {
             produtos[total].id = id;
             strncpy(produtos[total].nome, nome, 127);
             produtos[total].nome[127] = '\0';
