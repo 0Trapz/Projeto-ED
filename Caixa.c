@@ -107,6 +107,65 @@ Pessoa* RemoverClienteFila(Caixa *c) {
     return cliente;
 }
 
+Pessoa* ProcurarClienteFila(Caixa *c, const char *id, int *posicao) {
+
+    NoCaixa *atual;
+    int pos = 1;
+
+    if(c ==NULL || c-> fila ==NULL || id == NULL)return NULL;
+
+    atual = c->fila->inicio;
+
+    while(atual != NULL){
+        if (atual->cliente != NULL && strcmp(atual->cliente->id, id) ==0){
+            if (posicao != NULL){
+                *posicao = pos;
+            }
+            return atual->cliente;
+        }
+        atual = atual->prox;
+        pos++;
+    }
+    return NULL;
+
+}
+
+Pessoa* RemoverClienteFilaPorID(Caixa *c, const char *id) {
+
+
+    NoCaixa *atual;
+    NoCaixa *anterior = NULL;
+    Pessoa *cliente;
+
+    if(c == NULL || c->fila == NULL || id == NULL) return NULL;
+    
+    atual = c->fila->inicio;
+
+    while (atual != NULL) {
+        if (atual->cliente != NULL && strcmp(atual->cliente->id, id) == 0) {
+            
+            if (anterior == NULL) {
+                c->fila->inicio = atual->prox;
+            } else {
+                anterior->prox = atual->prox;
+            }
+            if (atual == c->fila->fim) {
+                c->fila->fim = anterior; // Atualiza fim se necessário
+            }
+            c->fila->tamanho--;
+            
+            cliente = atual->cliente; 
+            free(atual);
+            return cliente;
+        }
+        anterior = atual;
+        atual = atual->prox;
+    }
+    return NULL; 
+}
+
+
+
 // Remover primeiro cliente da fila (muda estado 1→2)
 Pessoa* IniciarAtendimentoProximoCliente(Caixa *c) {
     if (!c || !c->fila || !c->fila->inicio) return NULL;

@@ -69,6 +69,14 @@ int FuncionarioEmUso(ptSupermercado s, int idFuncionario);
 void MostrarFuncionarios(ptSupermercado s);
 int MostrarSupermercado(ptSupermercado s);
 
+int AbrirCaixaSupermercado(ptSupermercado s);
+int FecharCaixaSupermercado(ptSupermercado s);
+void PesquisarClienteEmEspera(ptSupermercado s);
+void MoverClienteParaOutraCaixa(ptSupermercado s);
+int GravarHistoricoSimulacao(ptSupermercado s, char *nomeFicheiro);
+void MostrarMemoriaUtilizadaDesperdicada(ptSupermercado s);
+void ListarClientesAtendidosPorCaixa(ptSupermercado s);
+
 int ExecutarSimulacao(ptSupermercado s);
 int Supermercado_E_Para_Fechar(ptSupermercado s);
 void DestruirSupermercado(ptSupermercado s);

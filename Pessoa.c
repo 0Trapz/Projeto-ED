@@ -28,10 +28,14 @@ UniversoClientes carregarUniversoClientes(const char *ficheiro) {
             universo.array[idx].tempoCompra = 0.0f;
             universo.array[idx].tempoCaixa = 0.0f;
             universo.array[idx].estado = 0;
+            universo.array[idx].caixaAtendimento = -1;
             universo.array[idx].countVezesIda = 0;
             universo.array[idx].totalGastoHistorico = 0.0f;
             universo.array[idx].totalTempoHistorico = 0.0f;
             universo.array[idx].numTotalProdutoOferecido = 0;
+            universo.array[idx].tempoEspera = 0;
+            universo.array[idx].recebeuOferta = 0;
+            universo.array[idx].valorOferta = 0.0f;
             idx++;
         }
     }
@@ -53,7 +57,7 @@ void libertarUniversoClientes(UniversoClientes *universo) {
 Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, Produto *produtosDisponiveis, int totalProdutosDisponiveis, int numProdutos) {
     if (!universo || idx < 0 || idx >= universo->total || !produtosDisponiveis || totalProdutosDisponiveis <= 0 || numProdutos <= 0) return NULL;
     Pessoa *origem = &universo->array[idx];
-    Pessoa *p = (Pessoa *)malloc(sizeof(Pessoa));
+    Pessoa *p = (Pessoa *)calloc(1,sizeof(Pessoa));
     if (!p) return NULL;
     strncpy(p->id, origem->id, 15);
     p->id[15] = '\0';
@@ -63,18 +67,20 @@ Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, P
     // Sorteia produtos do universo e calcula caracteristicas desta ida do cliente
     float tempoCompraF = 0.0f;
     float tempoCaixaF = 0.0f;
-    p->numProdutos = SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, NULL, 0, &p->totalGasto, &tempoCompraF, &tempoCaixaF);
+    p->numProdutos = SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, p->carrinho, MAX_PRODUTOS_CARRINHO, &p->totalGasto, &tempoCompraF, &tempoCaixaF);
     p->tempoCompra = tempoCompraF;
     p->tempoCaixa = tempoCaixaF;
 
-    // Desconta o produto mais barato
-    Produto *maisBarato = ObterProdutoMaisBarato(produtosDisponiveis, totalProdutosDisponiveis);
-    if (maisBarato) p->totalGasto -= maisBarato->preco;
-    if (p->totalGasto < 0) p->totalGasto = 0;
+    p->tempoEspera = 0;
+    p->recebeuOferta = 0;
+    p->valorOferta = 0.0f;
+
     p->estado = 0;
+    p->caixaAtendimento = -1;
     p->countVezesIda = origem->countVezesIda + 1;
     p->totalGastoHistorico = origem->totalGastoHistorico;
     p->totalTempoHistorico = origem->totalTempoHistorico;
+    p->numTotalProdutoOferecido = origem->numTotalProdutoOferecido;
     return p;
 }
 
@@ -202,6 +208,9 @@ void mostrarClienteAtivo(const Pessoa *p, NodoCliente *ativos) {
     printf("Total gasto: %.2f\n", p->totalGasto);
     printf("Tempo de compra: %.2f\n", p->tempoCompra);
     printf("Tempo de caixa: %.2f\n", p->tempoCaixa);
+    printf("Tempo de espera: %d\n", p->tempoEspera);
+    printf("Recebeu oferta: %s\n", p->recebeuOferta ? "Sim" : "Não");
+    printf("Valor oferta: %.2f\n", p->valorOferta);
     printf("Estado: %d\n", p->estado);
     printf("Entradas: %d\n", p->countVezesIda);
 }
@@ -214,6 +223,10 @@ void mostrarClienteHistorico(const Pessoa *p, NodoClienteHistorico *historico) {
     printf("Total gasto: %.2f\n", p->totalGastoHistorico);
     printf("Tempo de compra: %.2f\n", p->tempoCompra);
     printf("Tempo de caixa: %.2f\n", p->tempoCaixa);
+    printf("Tempo de espera: %d\n", p->tempoEspera);
+    printf("Recebeu oferta: %s\n", p->recebeuOferta ? "Sim" : "Não");
+    printf("Valor oferta: %.2f\n", p->valorOferta);
+    printf("Produtos oferecidos: %d\n", p->numTotalProdutoOferecido);
     printf("Estado: %d\n", p->estado);
     printf("Entradas: %d\n", p->countVezesIda);
 }

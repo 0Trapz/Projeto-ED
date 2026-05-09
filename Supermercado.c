@@ -176,6 +176,10 @@ int InicializarCaixasSupermercado(ptSupermercado s)
         if (i < s->totalFuncionarios) {
             operador = s->funcionarios[i];
             operadorID = s->idFuncionario[i];
+
+            if(i == 0){
+                s->funcionarioEmUso[i] = 1;
+            }
         }
 
         s->caixas[i] = CriarCaixa(i + 1, operador, operadorID);
@@ -206,12 +210,22 @@ static void DistribuirClientesParaCaixas(ptSupermercado s)
         if (!caixa) {
             caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
             if (!caixa) return;
+
+            if(caixa->id > 0 && caixa->id <= s->totalFuncionarios){
+                s->funcionarioEmUso[caixa->id - 1] = 1; // Marcar operador como ocupado
+            }
         }
+
+       
 
         if (TamanhoDaFila(caixa) >= s->config.maxFila) {
             Caixa *novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
             if (novaCaixa) {
                 caixa = novaCaixa;
+
+                if(novaCaixa->id >0 && novaCaixa->id <= s->totalFuncionarios){
+                    s->funcionarioEmUso[novaCaixa->id - 1] = 1;
+                }
             }
         }
 
@@ -309,8 +323,12 @@ void EntradaPessoaSupermercado(ptSupermercado s){
     x = Aleatorio(0, 100);
     if (x < s->config.cadenciaEntradaClientes)
     {
-        cliente = criarClienteAtivoDoUniverso(&s->universoClientes, s->proximoCliente, s->produtosDisponiveis, s->TotalProdutosDisponiveis, 3);
-        if (!cliente) return;
+       int indiceCliente;
+       int numProdutos;
+       indiceCliente = Aleatorio(0, s->universoClientes.total - 1);
+       numProdutos = Aleatorio(1, MAX_PRODUTOS_CARRINHO);
+       cliente = criarClienteAtivoDoUniverso(&s->universoClientes, indiceCliente, s->produtosDisponiveis, s->TotalProdutosDisponiveis, numProdutos); 
+       if (!cliente) return;
 
         s->proximoCliente++;
         AdicionarClienteAoSistema(s, cliente);
@@ -318,6 +336,126 @@ void EntradaPessoaSupermercado(ptSupermercado s){
     }
 } 
 
+static void AtualizarFilaEspera(ptSupermercado s){
+    int i; 
+    NoCaixa *atual;
+    Pessoa *cliente;
+    Produto *produtoOferta;
+
+    if( s== NULL || s->caixas == NULL) return;
+    for (i=0; i < s->config.nCaixas; i++){
+        if (s-> caixas[i] == NULL || s->caixas[i]->fila == NULL)
+        continue;
+
+        atual = s->caixas[i]->fila->inicio;
+       
+        while(atual != NULL){
+            cliente = atual->cliente;
+
+            if (cliente !=NULL){
+                cliente->tempoEspera++;
+
+                if (cliente->tempoEspera > s->config.maxEspera && cliente->recebeuOferta == 0) {
+                    produtoOferta = ObterProdutoMaisBarato(cliente->carrinho, cliente->numProdutos);
+                    if (produtoOferta != NULL) {
+                        cliente->totalGasto -= produtoOferta->preco;
+
+                        if(cliente->totalGasto <0)
+                        cliente->totalGasto = 0;
+
+
+                    cliente->recebeuOferta = 1;
+                    cliente->valorOferta = produtoOferta->preco;
+                    cliente->numTotalProdutoOferecido++;
+                    
+                    s->totalProdutosOferecidos++;
+                    s->custoTotalOfertas += produtoOferta->preco;
+
+                        }
+                }
+            }
+            atual = atual->prox;
+        }
+
+    }
+}
+static void GerirCaixasAutomaticamente(ptSupermercado s){
+    int i;
+    int caixasAtivas = 0;
+    int totalEmFila = 0;
+    float mediaFila;
+    Caixa *novaCaixa;
+    Caixa *caixaFechar = NULL;
+    Pessoa *cliente;
+    Caixa *destino;
+
+    if (s == NULL || s->caixas == NULL) return;
+
+    for (i = 0; i < s->config.nCaixas; i++) {
+        if (s->caixas[i] != NULL && s->caixas[i]->ativa) {
+            caixasAtivas++;
+            totalEmFila += TamanhoDaFila(s->caixas[i]);
+        }
+    }
+
+    if (caixasAtivas == 0) return;
+
+    mediaFila = (float)totalEmFila / caixasAtivas;
+
+    if (mediaFila > s->config.maxFila) {
+        novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+
+        if (novaCaixa != NULL) {
+            if (novaCaixa->id > 0 && novaCaixa->id <= s->totalFuncionarios) {
+                s->funcionarioEmUso[novaCaixa->id - 1] = 1;
+            }
+
+            printf("[AUTO] Caixa %d aberta. Media fila: %.2f\n",
+                   novaCaixa->id, mediaFila);
+        }
+
+        return;
+    }
+
+    if (mediaFila < s->config.minFila && caixasAtivas > 1) {
+        for (i = 0; i < s->config.nCaixas; i++) {
+            Caixa *c = s->caixas[i];
+
+            if (c == NULL || !c->ativa) continue;
+
+            if (caixaFechar == NULL || TamanhoDaFila(c) < TamanhoDaFila(caixaFechar)) {
+                caixaFechar = c;
+            }
+        }
+
+        if (caixaFechar == NULL) return;
+
+        caixaFechar->ativa = 0;
+
+        while (TamanhoDaFila(caixaFechar) > 0) {
+            cliente = RemoverClienteFila(caixaFechar);
+
+            if (cliente == NULL) break;
+
+            destino = CaixaComMenorFila(s->caixas, s->config.nCaixas);
+
+            if (destino == NULL) {
+                AdicionarClienteFila(caixaFechar, cliente);
+                caixaFechar->ativa = 1;
+                return;
+            }
+
+            AdicionarClienteFila(destino, cliente);
+        }
+
+        if (caixaFechar->id > 0 && caixaFechar->id <= s->totalFuncionarios) {
+            s->funcionarioEmUso[caixaFechar->id - 1] = 0;
+        }
+
+        printf("[AUTO] Caixa %d fechada. Media fila: %.2f\n",
+               caixaFechar->id, mediaFila);
+    }
+}
 
 int ExecutarSimulacao(ptSupermercado s)
 {
@@ -326,6 +464,8 @@ int ExecutarSimulacao(ptSupermercado s)
     EntradaPessoaSupermercado(s);
 
     DistribuirClientesParaCaixas(s);
+    AtualizarFilaEspera(s);
+    GerirCaixasAutomaticamente(s);
 
     if (s->caixas != NULL) {
         int i;
@@ -335,8 +475,11 @@ int ExecutarSimulacao(ptSupermercado s)
             if (ProcessarCaixa(s->caixas[i], &clienteFinalizado) && clienteFinalizado != NULL) {
                 s->totalClientesAtendidos++;
                 s->totalProdutosVendidos += clienteFinalizado->numProdutos;
+                s->tempoTotalEspera += clienteFinalizado->tempoEspera;
+                s->numeroTotalEsperas++;
+                clienteFinalizado->caixaAtendimento = s->caixas[i]->id;
                 clienteFinalizado->totalGastoHistorico += clienteFinalizado->totalGasto;
-                clienteFinalizado->totalTempoHistorico += clienteFinalizado->tempoCompra + clienteFinalizado->tempoCaixa;
+                clienteFinalizado->totalTempoHistorico += clienteFinalizado->tempoCompra + clienteFinalizado->tempoEspera + clienteFinalizado->tempoCaixa;
                 adicionarClienteHistorico(&s->clientesHistorico, clienteFinalizado);
             }
         }
@@ -380,4 +523,348 @@ void DestruirSupermercado(ptSupermercado s)
 
     free(s);
 
+}
+
+
+
+int AbrirCaixaSupermercado(Supermercado *s)
+{
+    Caixa *caixa;
+    if (s == NULL || s->caixas == NULL ) return 0;
+    caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+    
+    if(caixa == NULL){
+        printf("[INFO] Não existem caixas disponíveis para abrir.\n");
+        return 0;
+    }
+
+    if(caixa->id > 0 && caixa->id <= s->totalFuncionarios){
+        s->funcionarioEmUso[caixa->id - 1] = 1;
+    }
+    printf("[OK] Caixa %d aberta.\n", caixa->id);
+    return 1;
+}
+
+int FecharCaixaSupermercado(Supermercado *s){
+    int i;
+    int totalAtivas = 0;
+    Caixa *caixaFechar = NULL;
+    Caixa *destino;
+    Pessoa *cliente;
+    int clientesMovidos = 0;
+
+    if (s == NULL || s->caixas == NULL) return 0;
+
+    for (i = 0; i < s->config.nCaixas; i++) {
+        if (s->caixas[i] != NULL && s->caixas[i]->ativa) {
+            totalAtivas++;
+        }
+    }
+
+    if (totalAtivas <= 1) {
+        printf("[INFO] Nao podes fechar a unica caixa ativa.\n");
+        return 0;
+    }
+
+    for (i = 0; i < s->config.nCaixas; i++) {
+        Caixa *c = s->caixas[i];
+
+        if (c == NULL || !c->ativa) continue;
+
+        if (caixaFechar == NULL || TamanhoDaFila(c) < TamanhoDaFila(caixaFechar)) {
+            caixaFechar = c;
+        }
+    }
+
+    if (caixaFechar == NULL) {
+        printf("[ERRO] Nao foi encontrada nenhuma caixa para fechar.\n");
+        return 0;
+    }
+
+    printf("[INFO] A fechar caixa %d...\n", caixaFechar->id);
+
+    caixaFechar->ativa = 0;
+
+    while (TamanhoDaFila(caixaFechar) > 0) {
+        cliente = RemoverClienteFila(caixaFechar);
+
+        if (cliente == NULL) break;
+
+        destino = CaixaComMenorFila(s->caixas, s->config.nCaixas);
+
+        if (destino == NULL) {
+            AdicionarClienteFila(caixaFechar, cliente);
+            caixaFechar->ativa = 1;
+            printf("[ERRO] Nao existe caixa ativa para redistribuir clientes.\n");
+            return 0;
+        }
+
+        AdicionarClienteFila(destino, cliente);
+        clientesMovidos++;
+    }
+
+    if (caixaFechar->id > 0 && caixaFechar->id <= s->totalFuncionarios) {
+        s->funcionarioEmUso[caixaFechar->id - 1] = 0;
+    }
+
+    printf("[OK] Caixa %d fechada. Clientes movidos: %d\n",
+           caixaFechar->id, clientesMovidos);
+
+    return 1;
+}
+
+void PesquisarClienteEmEspera(Supermercado *s){
+    char id [16];
+    int i;
+    int posicao;
+    Pessoa *cliente;
+
+    if (s == NULL || s->caixas == NULL) return;
+    printf("Digite o ID do cliente para pesquisar: ");
+    scanf("%15s", id);
+
+    for(i=0; i < s->config.nCaixas; i++){
+        if (s->caixas[i] == NULL) continue;
+        
+        posicao = 0;
+        cliente = ProcurarClienteFila(s->caixas[i], id, &posicao);
+
+        if (cliente != NULL) {
+            printf("Cliente %s encontrado na caixa %d, posição %d na fila.\n", cliente->id, s->caixas[i]->id, posicao);
+            printf("Tempo de espera atual: %d segundos\n", cliente->tempoEspera);
+            return;
+        }
+    }
+    printf("[INFO] Cliente %s não foi encontrado em nenhuma fila da caixa.\n", id);
+}
+
+void MoverClienteParaOutraCaixa(Supermercado *s){
+    char id[16];
+    int caixaDestino;
+    int i;
+    int origem = -1;
+    Pessoa *cliente;
+    Caixa *destino;
+
+if (s == NULL || s->caixas == NULL) return;
+    printf("Digite o ID do cliente para mover: ");
+    scanf("%15s", id);
+
+    printf("Numero da caixa de destino: ");
+    scanf("%d", &caixaDestino);
+
+   if(caixaDestino < 1 || caixaDestino > s->config.nCaixas){
+    printf("[ERRO] Caixa de destino inválida.\n");
+    return;
+   }
+   destino = s->caixas[caixaDestino - 1];
+   if (destino == NULL || destino->ativa == 0 ){
+    printf("[ERRO] Caixa de destino não está ativa.\n");
+    return;
+   }
+
+    for(i=0; i < s->config.nCaixas; i++){
+        if (s->caixas[i] == NULL) continue;
+        
+        cliente = ProcurarClienteFila(s->caixas[i], id, NULL);
+
+        if (cliente != NULL) {
+            origem = i;
+            break;
+        }
+    }
+    if (origem == -1) {
+    printf("[INFO] Cliente %s não foi encontrado em nenhuma fila de espera.\n", id);
+    return;
+   }
+
+   if (origem == caixaDestino - 1) {
+    printf("[INFO] Cliente %s já está nessa caixa %d.\n", id, caixaDestino);
+    return;
+   }
+   cliente = RemoverClienteFilaPorID(s->caixas[origem], id);
+
+    if (cliente == NULL) {
+     printf("[ERRO] Falha ao remover cliente %s da fila.\n", id);
+     return;
+    }
+    
+    AdicionarClienteFila(destino, cliente);
+    printf("[OK] Cliente %s movido da caixa %d para a caixa %d.\n", id, s->caixas[origem]->id, destino->id);
+
+   
+}
+
+int GravarHistoricoSimulacao(Supermercado *s, char *nomeFicheiro){
+     FILE *f;
+    NodoCliente *atual;
+    float tempoMedioEspera = 0.0f;
+
+    if (s == NULL || nomeFicheiro == NULL) return 0;
+
+    f = fopen(nomeFicheiro, "w");
+
+    if (f == NULL) {
+        printf("[ERRO] Nao foi possivel criar o ficheiro %s.\n", nomeFicheiro);
+        return 0;
+    }
+
+    if (s->numeroTotalEsperas > 0) {
+        tempoMedioEspera = (float)s->tempoTotalEspera / s->numeroTotalEsperas;
+    }
+
+    fprintf(f, "ESTATISTICAS\n");
+    fprintf(f, "clientes_atendidos;%d\n", s->totalClientesAtendidos);
+    fprintf(f, "produtos_vendidos;%d\n", s->totalProdutosVendidos);
+    fprintf(f, "produtos_oferecidos;%d\n", s->totalProdutosOferecidos);
+    fprintf(f, "custo_total_ofertas;%.2f\n", s->custoTotalOfertas);
+    fprintf(f, "tempo_medio_espera;%.2f\n", tempoMedioEspera);
+
+    fprintf(f, "\nCLIENTES_ATENDIDOS\n");
+    fprintf(f, "id;nome;caixa_atendimento;num_produtos;total_gasto;tempo_compra;tempo_espera;tempo_caixa;recebeu_oferta;valor_oferta\n");
+
+    atual = s->clientesHistorico;
+
+    while (atual != NULL) {
+        Pessoa *p = atual->cliente;
+
+        if (p != NULL) {
+            fprintf(f, "%s;%s;%d;%d;%.2f;%.2f;%d;%.2f;%d;%.2f\n",
+                p->id,
+                p->nome,
+                p->caixaAtendimento,
+                p->numProdutos,
+                p->totalGasto,
+                p->tempoCompra,
+                p->tempoEspera,
+                p->tempoCaixa,
+                p->recebeuOferta,
+                p->valorOferta);
+        }
+
+        atual = atual->prox;
+    }
+
+    fclose(f);
+
+    printf("[OK] Historico gravado em %s.\n", nomeFicheiro);
+    return 1;
+}
+
+void MostrarMemoriaUtilizadaDesperdicada(Supermercado *s){
+    int i;
+    size_t memoriaUsada = 0;
+    size_t memoriaDesperdicada = 0;
+    NodoCliente *atual;
+
+    if (s == NULL) return;
+
+    memoriaUsada += sizeof(Supermercado);
+
+    if (s->produtosDisponiveis != NULL) {
+        memoriaUsada += sizeof(Produto) * s->TotalProdutosDisponiveis;
+    }
+
+    if (s->universoClientes.array != NULL) {
+        memoriaUsada += sizeof(Pessoa) * s->universoClientes.total;
+    }
+
+    if (s->caixas != NULL) {
+        memoriaUsada += sizeof(Caixa *) * s->config.nCaixas;
+
+        for (i = 0; i < s->config.nCaixas; i++) {
+            Caixa *c = s->caixas[i];
+
+            if (c != NULL) {
+                memoriaUsada += sizeof(Caixa);
+
+                if (c->fila != NULL) {
+                    NoCaixa *no = c->fila->inicio;
+
+                    memoriaUsada += sizeof(FilaCaixa);
+
+                    while (no != NULL) {
+                        memoriaUsada += sizeof(NoCaixa);
+                        no = no->prox;
+                    }
+                }
+
+                if (c->operador != NULL) {
+                    memoriaUsada += strlen(c->operador) + 1;
+                }
+
+                if (!c->ativa) {
+                    memoriaDesperdicada += sizeof(Caixa);
+
+                    if (c->fila != NULL) {
+                        memoriaDesperdicada += sizeof(FilaCaixa);
+                    }
+                }
+            }
+        }
+    }
+
+    atual = s->clientesEmCompras;
+
+    while (atual != NULL) {
+        memoriaUsada += sizeof(NodoCliente);
+        atual = atual->prox;
+    }
+
+    atual = s->clientesHistorico;
+
+    while (atual != NULL) {
+        memoriaUsada += sizeof(NodoCliente);
+        atual = atual->prox;
+    }
+
+    printf("\n========== MEMORIA ==========\n");
+    printf("Memoria usada aproximada: %zu bytes\n", memoriaUsada);
+    printf("Memoria desperdicada aproximada: %zu bytes\n", memoriaDesperdicada);
+    printf("=============================\n\n");
+}
+
+void ListarClientesAtendidosPorCaixa(ptSupermercado s)
+{
+    int numeroCaixa;
+    int encontrados = 0;
+    NodoCliente *atual;
+
+    if (s == NULL) return;
+
+    printf("Numero da caixa: ");
+    scanf("%d", &numeroCaixa);
+
+    if (numeroCaixa < 1 || numeroCaixa > s->config.nCaixas) {
+        printf("[ERRO] Caixa invalida.\n");
+        return;
+    }
+
+    printf("\nClientes atendidos pela caixa %d:\n", numeroCaixa);
+    printf("----------------------------------------\n");
+
+    atual = s->clientesHistorico;
+
+    while (atual != NULL) {
+        Pessoa *p = atual->cliente;
+
+        if (p != NULL && p->caixaAtendimento == numeroCaixa) {
+            printf("ID: %s | Nome: %s | Produtos: %d | Total: %.2f | Espera: %d\n",
+                   p->id,
+                   p->nome,
+                   p->numProdutos,
+                   p->totalGasto,
+                   p->tempoEspera);
+            encontrados++;
+        }
+
+        atual = atual->prox;
+    }
+
+    if (encontrados == 0) {
+        printf("[INFO] Nenhum cliente encontrado para esta caixa.\n");
+    }
+
+    printf("----------------------------------------\n");
+    printf("Total encontrados: %d\n\n", encontrados);
 }

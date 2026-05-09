@@ -53,3 +53,16 @@ int LerLinhaFicheiro(FILE *f, char *destino, int tamanho) {
     destino[strcspn(destino, "\r\n")] = '\0';
     return 1;
 }
+
+void RegistarAcaoMenuCSV(const char *ficheiro, int opcao, const char *descricao) {
+
+    FILE *f;
+
+    if (ficheiro == NULL || descricao == NULL) return;
+
+    f = fopen(ficheiro, "a");
+
+    if (f == NULL) return;
+    fprintf(f, "%d;%s\n", opcao, descricao);
+    fclose(f);
+}

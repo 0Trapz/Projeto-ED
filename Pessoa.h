@@ -1,5 +1,6 @@
 #ifndef PESSOA_H_INCLUDED
 #define PESSOA_H_INCLUDED
+#define MAX_PRODUTOS_CARRINHO 20
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,14 +16,19 @@ typedef struct {
     char id[16];               // Identificador do cliente (ex: P1, P21)
     char nome[128];            // Nome do cliente
     int numProdutos;           // Numero de produtos sorteados para a ida atual
+    Produto carrinho[MAX_PRODUTOS_CARRINHO];
     float totalGasto;          // Total gasto na ida atual
     float tempoCompra;           // Tempo de compra na ida atual
     float tempoCaixa;            // Tempo de caixa na ida atual
-    int estado;                // Estado do cliente (ex: 0 = compras, 1 = espera, 2 = atendimento, 3 = out, etc.)
+    int estado;                    // Estado do cliente (ex: 0 = compras, 1 = espera, 2 = atendimento, 3 = out, etc.)
+    int caixaAtendimento;             
     int countVezesIda;         // Contador de vezes que o cliente foi ao supermercado
     float totalGastoHistorico;   // Total gasto acumulado em todas as idas ao supermercado
     float totalTempoHistorico;   // Total de tempo gasto acumulado em todas as idas ao supermercado
     int numTotalProdutoOferecido; // Total de produtos oferecidos acumulado em todas as idas ao supermercado
+    int tempoEspera;
+    int recebeuOferta;
+    float valorOferta;
     // Outros campos úteis podem ser adicionados (ex: estado, tempo de espera, etc.)
 } Pessoa;
 
@@ -71,7 +77,7 @@ void moverClienteParaHistorico(NodoCliente **ativos, NodoCliente **historico, co
 // Funções utilitárias de cliente
 void mostrarClienteAtivo(const Pessoa *p, NodoCliente *ativos); 
 void mostrarClienteHistorico(const Pessoa *p, NodoClienteHistorico *historico);
-// Nota: Produtos não são guardados por pessoa; operações são feitas na lista global
+// Nota: Cada pessoa guarda o carrinho da ida atual, para efeitos de oferta de produto.
 
 // Função de registo CSV
 void registarAcaoCSV(const char *ficheiro, const char *acao, const Pessoa *cliente);

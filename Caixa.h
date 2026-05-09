@@ -32,7 +32,7 @@ typedef struct{
     FilaCaixa *fila;
     Pessoa *emAtendimento; //clientes em estado 1 ou 2
     int tempoAtendimentoDecorrido;
-    int ativa; //1 = aberta e 2 = fechada
+    int ativa; //1 = aberta e 0 = fechada
     int clientesAtendidos;
     int produtosVendidos;
     float revenue; //receita total da caixa
@@ -51,6 +51,8 @@ void DestruirCaixa(Caixa *c);
 // Funções de atendimento
 void AdicionarClienteFila(Caixa *c, Pessoa *cliente); //muda estado de 0->1
 Pessoa* RemoverClienteFila(Caixa *c);
+Pessoa* ProcurarClienteFila(Caixa *c, const char *id, int *posicao );
+Pessoa* RemoverClienteFilaPorID(Caixa *c, const char *id);
 Caixa* CaixaComMenorFila(Caixa **caixas, int totalCaixas);
 Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas);
 int ProcessarCaixa(Caixa *c, Pessoa **clienteFinalizado);
