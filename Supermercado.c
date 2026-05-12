@@ -226,6 +226,8 @@ static void DistribuirClientesParaCaixas(ptSupermercado s)
                 if(novaCaixa->id >0 && novaCaixa->id <= s->totalFuncionarios){
                     s->funcionarioEmUso[novaCaixa->id - 1] = 1;
                 }
+                printf("[AUTO] Caixa %d aberta. Operador: %s | Media fila: %.2d\n",
+                       novaCaixa->id, novaCaixa->operador, s->config.maxFila);
             }
         }
 
