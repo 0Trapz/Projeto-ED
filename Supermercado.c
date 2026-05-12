@@ -410,8 +410,8 @@ static void GerirCaixasAutomaticamente(ptSupermercado s){
                 s->funcionarioEmUso[novaCaixa->id - 1] = 1;
             }
 
-            printf("[AUTO] Caixa %d aberta. Media fila: %.2f\n",
-                   novaCaixa->id, mediaFila);
+            printf("[AUTO] Caixa %d aberta. Operador: %s | Media fila: %.2f\n",
+                   novaCaixa->id, novaCaixa->operador, mediaFila);
         }
 
         return;
@@ -452,8 +452,8 @@ static void GerirCaixasAutomaticamente(ptSupermercado s){
             s->funcionarioEmUso[caixaFechar->id - 1] = 0;
         }
 
-        printf("[AUTO] Caixa %d fechada. Media fila: %.2f\n",
-               caixaFechar->id, mediaFila);
+        printf("[AUTO] Caixa %d fechada. Operador: %s | Media fila: %.2f\n",
+               caixaFechar->id, caixaFechar->operador, mediaFila);
     }
 }
 
