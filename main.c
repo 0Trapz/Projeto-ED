@@ -206,7 +206,7 @@ int main()
     printf("[OK] Inicializadas %d caixas (1 ativa, resto inativa).\n\n", Lidl->config.nCaixas);
 
     
-    int opcao;
+    int opcao = -1;
     do{
         printf("\n==============================Menu==============================\n");
         printf("1 - Mostrar Supermercado\n");
@@ -222,7 +222,11 @@ int main()
         printf("11 - Listar clientes atendidos por caixa\n");
         printf("0 - Sair\n");
         printf("Opcao: ");
-        scanf("%d", &opcao);
+        if (scanf("%d", &opcao) != 1) {
+            printf("Opcao invalida. Tente novamente.\n");
+            while (getchar() != '\n');
+            continue;
+        }
 
         switch (opcao) {
             case 1: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar Supermercado"); 

@@ -93,6 +93,7 @@ void AdicionarClienteFila(Caixa *c, Pessoa *cliente) {
     c->fila->tamanho++;
 }
 
+// Remover primeiro cliente da fila (muda estado 1→2)
 Pessoa* RemoverClienteFila(Caixa *c) {
     if (!c || !c->fila || !c->fila->inicio) return NULL;
 
@@ -107,6 +108,7 @@ Pessoa* RemoverClienteFila(Caixa *c) {
     return cliente;
 }
 
+// Procurar cliente na fila por ID (retorna ponteiro para Pessoa ou NULL)
 Pessoa* ProcurarClienteFila(Caixa *c, const char *id, int *posicao) {
 
     NoCaixa *atual;
@@ -130,6 +132,7 @@ Pessoa* ProcurarClienteFila(Caixa *c, const char *id, int *posicao) {
 
 }
 
+// Remover cliente específico da fila por ID (muda estado 1→0 e retorna ponteiro para Pessoa ou NULL)
 Pessoa* RemoverClienteFilaPorID(Caixa *c, const char *id) {
 
 
@@ -163,8 +166,6 @@ Pessoa* RemoverClienteFilaPorID(Caixa *c, const char *id) {
     }
     return NULL; 
 }
-
-
 
 // Remover primeiro cliente da fila (muda estado 1→2)
 Pessoa* IniciarAtendimentoProximoCliente(Caixa *c) {
@@ -225,6 +226,7 @@ Pessoa* ObterClienteEmAtendimento(Caixa *c) {
     return c->emAtendimento;
 }
 
+// Encontrar caixa com menor fila (ativa) - retorna ponteiro para Caixa ou NULL
 Caixa* CaixaComMenorFila(Caixa **caixas, int totalCaixas) {
     Caixa *melhor = NULL;
     int i;
@@ -242,6 +244,7 @@ Caixa* CaixaComMenorFila(Caixa **caixas, int totalCaixas) {
     return melhor;
 }
 
+// Abrir próxima caixa inativa - retorna ponteiro para Caixa ou NULL
 Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas) {
     int i;
 
@@ -257,6 +260,7 @@ Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas) {
     return NULL;
 }
 
+// Processar caixa (incrementa tempo de atendimento e finaliza cliente se tempo atingido)
 int ProcessarCaixa(Caixa *c, Pessoa **clienteFinalizado) {
     if (clienteFinalizado) {
         *clienteFinalizado = NULL;

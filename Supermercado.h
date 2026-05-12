@@ -13,7 +13,11 @@
 #define MAX_FUNCIONARIOS 100
 #define MAX_NOME_FUNCIONARIO 80
 
+// ------------------------------------------------------------------------------
+// Estruturas
+// ------------------------------------------------------------------------------
 
+// Estrutura de configuração do supermercado
 typedef struct
 {   int maxEspera;
     int nCaixas;
@@ -26,6 +30,7 @@ typedef struct
     int maxPreco;
 } CONFIGURACAO, *ptCONFIGURACAO;
 
+// Estrutura principal do supermercado
 typedef struct
 { 
     char nome[MAX_NOME_SUPERMERCADO + 1];
@@ -54,10 +59,11 @@ typedef struct
     int tempoTotalEspera;
     int numeroTotalEsperas;
 
-
 } Supermercado, *ptSupermercado;
 
-
+// ------------------------------------------------------------------------------
+// Protótipos de funções
+// ------------------------------------------------------------------------------
 ptSupermercado CriarSupermercado(char *nome);
 int InicializarSupermercado(ptSupermercado s, char *nomeFicheiroConfig);
 int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios);
