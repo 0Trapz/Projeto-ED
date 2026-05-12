@@ -545,6 +545,10 @@ int AbrirCaixaSupermercado(Supermercado *s)
     return 1;
 }
 
+
+
+
+
 int FecharCaixaSupermercado(Supermercado *s){
     int i;
     int totalAtivas = 0;
