@@ -17,5 +17,6 @@ void wait_segundos(int seconds);
 int TeclaPressionada();
 int LerLinhaFicheiro(FILE *f, char *destino, int tamanho);
 void RegistarAcaoMenuCSV(const char *ficheiro, int opcao, const char *descricao);
+void PausarPagina(int *contador, int limite);
 
 #endif // UTEIS_H

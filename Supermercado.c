@@ -290,11 +290,14 @@ int FuncionarioEmUso(ptSupermercado s, int idFuncionario)
 void MostrarFuncionarios(ptSupermercado s)
 {
     int i;
+    int linhas = 0;
     if (s == NULL) return;
 
     for (i=0; i <s->totalFuncionarios; i++)
     {
         printf("ID: %d, Nome: %s, Em Uso: %s\n", s->idFuncionario[i], s->funcionarios[i], s->funcionarioEmUso[i] ? "Sim" : "Não");
+        
+        PausarPagina(&linhas, 20); 
     }
 }
 
@@ -323,12 +326,17 @@ int MostrarSupermercado(ptSupermercado s)
             printf("  Caixa %d: indisponivel\n", i + 1);
             continue;
         }
-        printf("  Caixa %d: %s | fila=%d | atendidos=%d | receita=%.2f\n",
+        printf("  Caixa %d: %s | fila=%d | atendidos=%d | receita=%.2f",
                caixa->id,
                caixa->ativa ? "ativa" : "inativa",
                TamanhoDaFila(caixa),
                caixa->clientesAtendidos,
                caixa->revenue);
+
+        if(!caixa->ativa && caixa->motivoFecho[0] != '\0'){
+            printf(" | motivo do fecho %s", caixa->motivoFecho);
+        }
+        printf("\n");
     }
 
     return 1;
@@ -339,6 +347,8 @@ void EntradaPessoaSupermercado(ptSupermercado s){
     int x;
     Pessoa *cliente;
     if (s == NULL) return;
+    
+    if(Supermercado_E_Para_Fechar(s)) return;
 
     x = Aleatorio(0, 100);
     if (x < s->config.cadenciaEntradaClientes)
@@ -515,16 +525,56 @@ int ExecutarSimulacao(ptSupermercado s)
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 int Supermercado_E_Para_Fechar(Supermercado *s)
 {
+    int horaAtual;
+
     if (s == NULL || s->relogio == NULL) return 1;
 
-    int horaAtual = s->relogio->horas;
-    int minutoAtual = s->relogio->minutos;
+    horaAtual = s->relogio->horas;
 
-    if (horaAtual > s->config.horaFecho || (horaAtual == s->config.horaFecho && minutoAtual > 0)) {
-        return 1; // Supermercado deve fechar
+    if (horaAtual >= s->config.horaFecho) {
+        return 1;
     }
-    return 0; // Supermercado ainda pode permanecer aberto
+
+    return 0;
 }
+
+
+int Supermercado_Vazio(ptSupermercado s)
+{
+    int i;
+    if (s == NULL) return 1;
+
+    if(s->clientesEmCompras != NULL) {
+        return 0;
+    }
+
+    if (s->caixas !=NULL){
+        for (i=0; i <s->config.nCaixas; i++){
+            if(s->caixas[i] == NULL) continue;
+
+            if(TamanhoDaFila(s->caixas[i])>0){
+                return 0;
+            }
+
+            if (s->caixas[i]->emAtendimento !=NULL){
+                return 0;
+            }
+
+        }
+    }
+    return 1;
+}
+
+int SimulacaoTerminada(ptSupermercado s)
+{
+    if (s == NULL) return 1;
+
+    if (Supermercado_E_Para_Fechar(s) && Supermercado_Vazio(s)) {
+        return 1; // Simulação terminada
+    }
+    return 0; // Simulação ainda em andamento
+}
+
 
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 void DestruirSupermercado(ptSupermercado s)
@@ -554,32 +604,66 @@ void DestruirSupermercado(ptSupermercado s)
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 int AbrirCaixaSupermercado(Supermercado *s)
 {
+    int numeroCaixa;
     Caixa *caixa;
-    if (s == NULL || s->caixas == NULL ) return 0;
-    caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
-    
-    if(caixa == NULL){
-        printf("[INFO] Não existem caixas disponíveis para abrir.\n");
+
+    if (s == NULL || s->caixas == NULL) return 0;
+
+    MostrarSupermercado(s);
+
+    printf("Numero da caixa a abrir: ");
+    if (scanf("%d", &numeroCaixa) != 1) {
+        printf("[ERRO] Valor invalido.\n");
+        while (getchar() != '\n');
+        return 0;
+    }
+    while (getchar() != '\n');
+
+    if (numeroCaixa < 1 || numeroCaixa > s->config.nCaixas) {
+        printf("[ERRO] Caixa invalida.\n");
         return 0;
     }
 
-    if(caixa->id > 0 && caixa->id <= s->totalFuncionarios){
+    caixa = s->caixas[numeroCaixa - 1];
+
+    if (caixa == NULL) {
+        printf("[ERRO] Caixa indisponivel.\n");
+        return 0;
+    }
+
+    if (caixa->ativa) {
+        printf("[INFO] Caixa %d ja esta aberta.\n", caixa->id);
+        return 0;
+    }
+
+    caixa->ativa = 1;
+    caixa->motivoFecho[0] = '\0';
+
+    if (caixa->id > 0 && caixa->id <= s->totalFuncionarios) {
         s->funcionarioEmUso[caixa->id - 1] = 1;
     }
-    printf("[OK] Caixa %d aberta.\n", caixa->id);
+
+    printf("[OK] Caixa %d aberta. Operador: %s\n", caixa->id, caixa->operador);
     return 1;
 }
 
+
 // Adicionar cliente à fila de caixa (muda estado 1→1)
-int FecharCaixaSupermercado(Supermercado *s){
+int FecharCaixaSupermercado(Supermercado *s)
+{
     int i;
+    int numeroCaixa;
     int totalAtivas = 0;
-    Caixa *caixaFechar = NULL;
+    int clientesMovidos = 0;
+    char motivo[128];
+
+    Caixa *caixaFechar;
     Caixa *destino;
     Pessoa *cliente;
-    int clientesMovidos = 0;
 
     if (s == NULL || s->caixas == NULL) return 0;
+
+    MostrarSupermercado(s);
 
     for (i = 0; i < s->config.nCaixas; i++) {
         if (s->caixas[i] != NULL && s->caixas[i]->ativa) {
@@ -592,24 +676,39 @@ int FecharCaixaSupermercado(Supermercado *s){
         return 0;
     }
 
-    for (i = 0; i < s->config.nCaixas; i++) {
-        Caixa *c = s->caixas[i];
-
-        if (c == NULL || !c->ativa) continue;
-
-        if (caixaFechar == NULL || TamanhoDaFila(c) < TamanhoDaFila(caixaFechar)) {
-            caixaFechar = c;
-        }
+    printf("Numero da caixa a fechar: ");
+    if (scanf("%d", &numeroCaixa) != 1) {
+        printf("[ERRO] Valor invalido.\n");
+        while (getchar() != '\n');
+        return 0;
     }
+    while (getchar() != '\n');
 
-    if (caixaFechar == NULL) {
-        printf("[ERRO] Nao foi encontrada nenhuma caixa para fechar.\n");
+    if (numeroCaixa < 1 || numeroCaixa > s->config.nCaixas) {
+        printf("[ERRO] Caixa invalida.\n");
         return 0;
     }
 
-    printf("[INFO] A fechar caixa %d...\n", caixaFechar->id);
+    caixaFechar = s->caixas[numeroCaixa - 1];
+
+    if (caixaFechar == NULL) {
+        printf("[ERRO] Caixa indisponivel.\n");
+        return 0;
+    }
+
+    if (!caixaFechar->ativa) {
+        printf("[INFO] Caixa %d ja esta fechada.\n", caixaFechar->id);
+        return 0;
+    }
+
+    printf("Motivo do fecho: ");
+    if (fgets(motivo, sizeof(motivo), stdin) == NULL) {
+        motivo[0] = '\0';
+    }
+    motivo[strcspn(motivo, "\r\n")] = '\0';
 
     caixaFechar->ativa = 0;
+    snprintf(caixaFechar->motivoFecho, sizeof(caixaFechar->motivoFecho), "%s", motivo);
 
     while (TamanhoDaFila(caixaFechar) > 0) {
         cliente = RemoverClienteFila(caixaFechar);
@@ -618,9 +717,24 @@ int FecharCaixaSupermercado(Supermercado *s){
 
         destino = CaixaComMenorFila(s->caixas, s->config.nCaixas);
 
+        if (destino != NULL && TamanhoDaFila(destino) >= s->config.maxFila) {
+            Caixa *novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+
+            if (novaCaixa != NULL) {
+                destino = novaCaixa;
+
+                if (novaCaixa->id > 0 && novaCaixa->id <= s->totalFuncionarios) {
+                    s->funcionarioEmUso[novaCaixa->id - 1] = 1;
+                }
+
+                printf("[AUTO] Caixa %d aberta para redistribuir clientes.\n", novaCaixa->id);
+            }
+        }
+
         if (destino == NULL) {
             AdicionarClienteFila(caixaFechar, cliente);
             caixaFechar->ativa = 1;
+            caixaFechar->motivoFecho[0] = '\0';
             printf("[ERRO] Nao existe caixa ativa para redistribuir clientes.\n");
             return 0;
         }
@@ -633,11 +747,14 @@ int FecharCaixaSupermercado(Supermercado *s){
         s->funcionarioEmUso[caixaFechar->id - 1] = 0;
     }
 
-    printf("[OK] Caixa %d fechada. Clientes movidos: %d\n",
-           caixaFechar->id, clientesMovidos);
+    printf("[OK] Caixa %d fechada. Motivo: %s | Clientes movidos: %d\n",
+           caixaFechar->id,
+           caixaFechar->motivoFecho,
+           clientesMovidos);
 
     return 1;
 }
+
 
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 void PesquisarClienteEmEspera(Supermercado *s){
@@ -748,7 +865,7 @@ int GravarHistoricoSimulacao(Supermercado *s, char *nomeFicheiro){
     fprintf(f, "tempo_medio_espera;%.2f\n", tempoMedioEspera);
 
     fprintf(f, "\nCLIENTES_ATENDIDOS\n");
-    fprintf(f, "id;nome;caixa_atendimento;num_produtos;total_gasto;tempo_compra;tempo_espera;tempo_caixa;recebeu_oferta;valor_oferta\n");
+    fprintf(f, "id;nome;caixa_atendimento;num_produtos;countVezesIda;total_gasto;tempo_compra;tempo_espera;tempo_caixa;recebeu_oferta;valor_oferta\n");
 
     atual = s->clientesHistorico;
 
@@ -756,11 +873,12 @@ int GravarHistoricoSimulacao(Supermercado *s, char *nomeFicheiro){
         Pessoa *p = atual->cliente;
 
         if (p != NULL) {
-            fprintf(f, "%s;%s;%d;%d;%.2f;%.2f;%d;%.2f;%d;%.2f\n",
+            fprintf(f, "%s;%s;%d;%d;%d;%.2f;%.2f;%d;%.2f;%d;%.2f\n",
                 p->id,
                 p->nome,
                 p->caixaAtendimento,
                 p->numProdutos,
+                p->countVezesIda,
                 p->totalGasto,
                 p->tempoCompra,
                 p->tempoEspera,
@@ -835,14 +953,23 @@ void MostrarMemoriaUtilizadaDesperdicada(Supermercado *s){
     atual = s->clientesEmCompras;
 
     while (atual != NULL) {
-        memoriaUsada += sizeof(NodoCliente);
-        atual = atual->prox;
+    memoriaUsada += sizeof(NodoCliente);
+
+    if (atual->cliente != NULL && atual->cliente->numProdutos < MAX_PRODUTOS_CARRINHO) {
+        memoriaDesperdicada += (size_t)(MAX_PRODUTOS_CARRINHO - atual->cliente->numProdutos) * sizeof(Produto);
     }
+
+    atual = atual->prox;
+}
+
 
     atual = s->clientesHistorico;
 
     while (atual != NULL) {
         memoriaUsada += sizeof(NodoCliente);
+        if (atual->cliente != NULL && atual->cliente->numProdutos < MAX_PRODUTOS_CARRINHO) {
+            memoriaDesperdicada += (size_t)(MAX_PRODUTOS_CARRINHO - atual->cliente->numProdutos) * sizeof(Produto);
+        }
         atual = atual->prox;
     }
 
@@ -885,6 +1012,8 @@ void ListarClientesAtendidosPorCaixa(ptSupermercado s)
                    p->totalGasto,
                    p->tempoEspera);
             encontrados++;
+
+            PausarPagina(&encontrados, 20);
         }
 
         atual = atual->prox;

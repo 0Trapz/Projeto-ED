@@ -41,6 +41,7 @@ Caixa* CriarCaixa(int id, const char *operador, int operadorID) {
     c->emAtendimento = NULL;
     c->tempoAtendimentoDecorrido = 0;
     c->ativa = 1;
+    c->motivoFecho[0] = '\0'; 
     c->clientesAtendidos = 0;
     c->produtosVendidos = 0;
     c->revenue = 0.0f;

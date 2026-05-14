@@ -36,6 +36,7 @@ typedef struct{
     int clientesAtendidos;
     int produtosVendidos;
     float revenue; //receita total da caixa
+    char motivoFecho[128]; //motivo do fecho da caixa
 } Caixa;
 
 //------------------------------------------------------------------------------

@@ -6,36 +6,59 @@
 #include "Uteis.h"
 
 
-void ExecutarCicloSimulacao(ptSupermercado Lidl){
-    
+void ExecutarCicloSimulacao(ptSupermercado Lidl)
+{
+    int terminar = 0;
+    int iteracoes = 0;
+    int linhas = 0; 
+
+    if (Lidl == NULL) return;
+
+    if (SimulacaoTerminada(Lidl)) {
+        printf("[INFO] Simulacao terminada. Supermercado fechado e vazio.\n");
+        return;
+    }
+
     printf("==========================================================\n");
-    printf("        SIMULACAO EM ANDAMENTO\n");
+    printf("        A Executar Simulacao\n");
     printf("==========================================================\n\n");
 
-    int Terminar = 0;
-    int iteracoes = 0;
 
-    while (!Terminar && iteracoes < 3600)  // 3600 segundos = 1 hora
+    printf("[INFO] Simulacao iniciada. Hora atual: %02d:%02d:%02d\n",
+           Lidl->relogio->horas,
+           Lidl->relogio->minutos,
+           Lidl->relogio->segundos);
+        
+
+    while (!terminar && iteracoes < 3600)
     {
-        // Executar um passo da simulacao
         if (!ExecutarSimulacao(Lidl)) {
             printf("[ERRO] Erro ao executar simulacao.\n");
             break;
         }
 
-        // Imprimir estatísticas a cada 60 iterações
-        if (iteracoes % 60 == 0 && iteracoes > 0) {
-            printf("[%03d:%02d] Atendidos: %d | Proximos a entrar: %d\n",
-                   Lidl->relogio->horas, Lidl->relogio->minutos,
-                   Lidl->totalClientesAtendidos,
-                   Lidl->proximoCliente);
-        }
         iteracoes++;
-        Terminar = Supermercado_E_Para_Fechar(Lidl);
-    }
-    printf("[OK] Simulacao concluida. Iteracoes: %d\n", iteracoes);
+        terminar = SimulacaoTerminada(Lidl);
 
+        if (iteracoes % 600 == 0){
+            PausarPagina(&linhas, 20);
+        }
+        
+    }
+
+    printf("[INFO] Simulacao terminada apos %d iteracoes.\n", iteracoes);
+
+    if (Supermercado_E_Para_Fechar(Lidl) && !Supermercado_Vazio(Lidl)) {
+        printf("[INFO] Supermercado fechado a novos clientes. A esvaziar caixas...\n");
+    }
+
+    printf("[PAUSA] Simulacao pausada apos %d segundos.\n", iteracoes);
+    printf("[INFO] Hora atual: %02d:%02d:%02d\n",
+           Lidl->relogio->horas,
+           Lidl->relogio->minutos,
+           Lidl->relogio->segundos);
 }
+
 
 void MostrarEstatisticasFinais(Supermercado *Lidl)
 {
@@ -84,7 +107,7 @@ void MostrarEstatisticasFinais(Supermercado *Lidl)
     printf("  - Produtos vendidos: %d\n", Lidl->totalProdutosVendidos);
     printf("  - Produtos oferecidos: %d\n", Lidl->totalProdutosOferecidos);
     printf("  - Custo total ofertas: %.2f\n", Lidl->custoTotalOfertas);
-    printf("  - Total de lucro das caixas: %.2f\n", lucroTotal);
+    printf("  - Total de Faturado nas caixas: %.2f\n", lucroTotal);
     printf("  - Tempo medio de espera: %.2f segundos\n", tempoMedioEspera);
 
     if (caixaMaisClientes != NULL) {
@@ -263,9 +286,11 @@ int main()
                 break;
             case 2:
                 MostrarFuncionarios(Lidl);
+                
                 break;
             case 3:
                 ExecutarCicloSimulacao(Lidl);
+                
                 break;
             case 4:
                 MostrarEstatisticasFinais(Lidl);
@@ -290,6 +315,7 @@ int main()
                 break;
             case 11:
                 ListarClientesAtendidosPorCaixa(Lidl);
+                
                 break;
             case 0:
                 printf("A sair do programa...\n");

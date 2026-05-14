@@ -85,6 +85,8 @@ void ListarClientesAtendidosPorCaixa(ptSupermercado s);
 
 int ExecutarSimulacao(ptSupermercado s);
 int Supermercado_E_Para_Fechar(ptSupermercado s);
+int Supermercado_Vazio(ptSupermercado s);
+int SimulacaoTerminada(ptSupermercado s);
 void DestruirSupermercado(ptSupermercado s);
 void EntradaPessoaSupermercado(ptSupermercado s);
 int InicializarCaixasSupermercado(ptSupermercado s);

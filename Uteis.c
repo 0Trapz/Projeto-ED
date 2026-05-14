@@ -66,3 +66,16 @@ void RegistarAcaoMenuCSV(const char *ficheiro, int opcao, const char *descricao)
     fprintf(f, "%d;%s\n", opcao, descricao);
     fclose(f);
 }
+
+void PausarPagina(int *contador, int limite){
+if (contador == NULL || limite <= 0 ) return; 
+
+(*contador)++;
+
+if(*contador >= limite){
+    printf("\n Pressione Enter para continuar...");
+    getchar();
+    *contador = 0;
+}
+
+}
