@@ -41,6 +41,11 @@ void ExecutarCicloSimulacao(ptSupermercado Lidl)
         terminar = SimulacaoTerminada(Lidl);
 
         if (iteracoes % 600 == 0){
+            printf("[TICK %d] Hora simulada: %02d:%02d:%02d\n",
+                iteracoes,
+                Lidl->relogio->horas,
+                Lidl->relogio->minutos,
+                Lidl->relogio->segundos);
             PausarPagina(&linhas, 1);
         }
         
