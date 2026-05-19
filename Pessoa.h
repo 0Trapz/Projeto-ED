@@ -19,6 +19,7 @@ typedef struct {
     Produto carrinho[MAX_PRODUTOS_CARRINHO];
     float totalGasto;          // Total gasto na ida atual
     float tempoCompra;           // Tempo de compra na ida atual
+    float tempoCompraRestante;   // Tempo que falta ate o cliente ir para a fila
     float tempoCaixa;            // Tempo de caixa na ida atual
     int estado;                    // Estado do cliente (ex: 0 = compras, 1 = espera, 2 = atendimento, 3 = out, etc.)
     int caixaAtendimento;             

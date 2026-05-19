@@ -46,7 +46,7 @@ void ExecutarCicloSimulacao(ptSupermercado Lidl)
         
     }
 
-    printf("[INFO] Simulacao terminada apos %d iteracoes.\n", iteracoes);
+   
 
     if (Supermercado_E_Para_Fechar(Lidl) && !Supermercado_Vazio(Lidl)) {
         printf("[INFO] Supermercado fechado a novos clientes. A esvaziar caixas...\n");

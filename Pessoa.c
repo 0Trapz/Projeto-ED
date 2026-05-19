@@ -69,6 +69,7 @@ Pessoa* criarClienteAtivoDoUniverso(const UniversoClientes *universo, int idx, P
     float tempoCaixaF = 0.0f;
     p->numProdutos = SortearProdutosParaCliente(produtosDisponiveis, totalProdutosDisponiveis, numProdutos, p->carrinho, MAX_PRODUTOS_CARRINHO, &p->totalGasto, &tempoCompraF, &tempoCaixaF);
     p->tempoCompra = tempoCompraF;
+    p->tempoCompraRestante = tempoCompraF;
     p->tempoCaixa = tempoCaixaF;
 
     p->tempoEspera = 0;

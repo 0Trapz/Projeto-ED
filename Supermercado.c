@@ -153,20 +153,6 @@ static void AdicionarClienteAoFim(NodoCliente **lista, Pessoa *cliente)
 }
 
 // Remover primeiro cliente da lista (muda estado 0→1 e retorna ponteiro para Pessoa ou NULL)
-static Pessoa *RemoverPrimeiroCliente(NodoCliente **lista)
-{
-    NodoCliente *primeiro;
-    Pessoa *cliente;
-
-    if (!lista || !*lista) return NULL;
-
-    primeiro = *lista;
-    *lista = primeiro->prox;
-    cliente = primeiro->cliente;
-    free(primeiro);
-    return cliente;
-}
-
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 int InicializarCaixasSupermercado(ptSupermercado s)
 {
@@ -209,45 +195,80 @@ static void AdicionarClienteAoSistema(ptSupermercado s, Pessoa *cliente)
 
 
 // Adicionar cliente à fila de caixa (muda estado 1→1)
+static void AtualizarClientesEmCompras(ptSupermercado s)
+{
+    NodoCliente *atual;
+
+    if (s == NULL) return;
+
+    atual = s->clientesEmCompras;
+
+    while (atual != NULL) {
+        if (atual->cliente != NULL && atual->cliente->tempoCompraRestante > 0) {
+            atual->cliente->tempoCompraRestante--;
+        }
+
+        atual = atual->prox;
+    }
+}
+
 static void DistribuirClientesParaCaixas(ptSupermercado s)
 {
+    NodoCliente *atual;
+    NodoCliente *anterior;
+    NodoCliente *remover;
     Pessoa *cliente;
     Caixa *caixa;
 
-    
-
     if (!s) return;
 
-    while (s->clientesEmCompras) {
-        caixa = CaixaComMenorFila(s->caixas, s->config.nCaixas);
+    anterior = NULL;
+    atual = s->clientesEmCompras;
 
-        if (!caixa) {
-            caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
-            if (!caixa) return;
+    while (atual != NULL) {
+        cliente = atual->cliente;
 
-            if(caixa->id > 0 && caixa->id <= s->totalFuncionarios){
-                s->funcionarioEmUso[caixa->id - 1] = 1; // Marcar operador como ocupado
-            }
-        }
+        if (cliente != NULL && cliente->tempoCompraRestante <= 0) {
+            caixa = CaixaComMenorFila(s->caixas, s->config.nCaixas);
 
-       
+            if (!caixa) {
+                caixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+                if (!caixa) return;
 
-        if (TamanhoDaFila(caixa) >= s->config.maxFila) {
-            Caixa *novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
-            if (novaCaixa) {
-                caixa = novaCaixa;
-
-                if(novaCaixa->id >0 && novaCaixa->id <= s->totalFuncionarios){
-                    s->funcionarioEmUso[novaCaixa->id - 1] = 1;
+                if(caixa->id > 0 && caixa->id <= s->totalFuncionarios){
+                    s->funcionarioEmUso[caixa->id - 1] = 1; // Marcar operador como ocupado
                 }
-                printf("[AUTO] Caixa %d aberta. Operador: %s | Media fila: %.2d\n",
-                       novaCaixa->id, novaCaixa->operador, s->config.maxFila);
             }
-        }
 
-        cliente = RemoverPrimeiroCliente(&s->clientesEmCompras);
-        if (!cliente) return;
-        AdicionarClienteFila(caixa, cliente);
+            if (TamanhoDaFila(caixa) >= s->config.maxFila) {
+                Caixa *novaCaixa = AbrirProximaCaixa(s->caixas, s->config.nCaixas);
+                if (novaCaixa) {
+                    caixa = novaCaixa;
+
+                    if(novaCaixa->id >0 && novaCaixa->id <= s->totalFuncionarios){
+                        s->funcionarioEmUso[novaCaixa->id - 1] = 1;
+                    }
+                    printf("[AUTO] Caixa %d aberta. Operador: %s | Media fila: %.2d\n",
+                           novaCaixa->id, novaCaixa->operador, s->config.maxFila);
+                }
+            }
+
+            remover = atual;
+
+            if (anterior == NULL) {
+                s->clientesEmCompras = atual->prox;
+            } else {
+                anterior->prox = atual->prox;
+            }
+
+            atual = atual->prox;
+
+            AdicionarClienteFila(caixa, cliente);
+            free(remover);
+        } else {
+            anterior = atual;
+            atual = atual->prox;
+        }
     }
 }
 
@@ -338,7 +359,7 @@ int MostrarSupermercado(ptSupermercado s)
                caixa->revenue);
 
         if(!caixa->ativa && caixa->motivoFecho[0] != '\0'){
-            printf(" | motivo do fecho %s", caixa->motivoFecho);
+            printf(" | motivo do fecho: %s", caixa->motivoFecho);
         }
         printf("\n");
     }
@@ -500,7 +521,7 @@ int ExecutarSimulacao(ptSupermercado s)
     if (s== NULL || s->relogio== NULL ) return 0;
     AvancarRelogio(s->relogio, 1); // Avança o relógio em 1 segundo
     EntradaPessoaSupermercado(s);
-    
+    AtualizarClientesEmCompras(s);
     DistribuirClientesParaCaixas(s);
     AtualizarFilaEspera(s);
     GerirCaixasAutomaticamente(s);

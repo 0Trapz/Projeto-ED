@@ -252,7 +252,7 @@ Caixa* AbrirProximaCaixa(Caixa **caixas, int totalCaixas) {
     if (!caixas || totalCaixas <= 0) return NULL;
 
     for (i = 0; i < totalCaixas; i++) {
-        if (caixas[i] && caixas[i]->ativa == 0) {
+        if (caixas[i] && caixas[i]->ativa == 0 && caixas[i]->motivoFecho[0] == '\0') {
             caixas[i]->ativa = 1;
             return caixas[i];
         }
