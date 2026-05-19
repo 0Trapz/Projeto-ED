@@ -41,7 +41,7 @@ void ExecutarCicloSimulacao(ptSupermercado Lidl)
         terminar = SimulacaoTerminada(Lidl);
 
         if (iteracoes % 600 == 0){
-            PausarPagina(&linhas, 20);
+            PausarPagina(&linhas, 1);
         }
         
     }
@@ -234,7 +234,7 @@ int main()
         printf("\n==============================Menu==============================\n");
         printf("1 - Mostrar Supermercado\n");
         printf("2 - Mostrar Funcionarios\n");
-        printf("3 - Inicializar simulacao\n");
+        printf("3 - Realizar a simulacao de 1H\n");
         printf("4 - Mostrar estatisticas finais\n");
         printf("5 - Abrir caixa\n");
         printf("6 - Fechar caixa\n");
@@ -250,13 +250,14 @@ int main()
             while (getchar() != '\n');
             continue;
         }
+        while (getchar() != '\n');
 
         switch (opcao) {
             case 1: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar Supermercado"); 
                 break;
             case 2: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar Funcionarios"); 
                 break;
-            case 3: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Inicializar simulacao"); 
+            case 3: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Realizar a simulacao de 1H"); 
                 break;
             case 4: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar estatisticas finais"); 
                 break;

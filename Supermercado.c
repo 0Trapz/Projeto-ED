@@ -206,11 +206,15 @@ static void AdicionarClienteAoSistema(ptSupermercado s, Pessoa *cliente)
     AdicionarClienteAoFim(&s->clientesEmCompras, cliente);
 }
 
+
+
 // Adicionar cliente à fila de caixa (muda estado 1→1)
 static void DistribuirClientesParaCaixas(ptSupermercado s)
 {
     Pessoa *cliente;
     Caixa *caixa;
+
+    
 
     if (!s) return;
 
@@ -496,7 +500,7 @@ int ExecutarSimulacao(ptSupermercado s)
     if (s== NULL || s->relogio== NULL ) return 0;
     AvancarRelogio(s->relogio, 1); // Avança o relógio em 1 segundo
     EntradaPessoaSupermercado(s);
-
+    
     DistribuirClientesParaCaixas(s);
     AtualizarFilaEspera(s);
     GerirCaixasAutomaticamente(s);
@@ -984,6 +988,7 @@ void ListarClientesAtendidosPorCaixa(ptSupermercado s)
 {
     int numeroCaixa;
     int encontrados = 0;
+    int linhas = 0;
     NodoCliente *atual;
 
     if (s == NULL) return;
@@ -1013,7 +1018,7 @@ void ListarClientesAtendidosPorCaixa(ptSupermercado s)
                    p->tempoEspera);
             encontrados++;
 
-            PausarPagina(&encontrados, 20);
+            PausarPagina(&linhas, 20);
         }
 
         atual = atual->prox;
