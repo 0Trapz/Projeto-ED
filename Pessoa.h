@@ -30,7 +30,6 @@ typedef struct {
     int tempoEspera;
     int recebeuOferta;
     float valorOferta;
-    // Outros campos úteis podem ser adicionados (ex: estado, tempo de espera, etc.)
 } Pessoa;
 
 // Estrutura para o universo de clientes (todos os clientes lidos do ficheiro)

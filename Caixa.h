@@ -12,7 +12,7 @@
 
 // Estrutura para um no de uma caixa
 typedef struct NoCaixa {
-    Pessoa *cliente; //ponteiro para Pessoa em UniversoClientes
+    Pessoa *cliente; // ponteiro para cliente ativo na simulacao
     int tempoAtendimentoDecorrido; //tempo ja passado
     struct NoCaixa *prox; 
 } NoCaixa;
@@ -30,7 +30,7 @@ typedef struct{
     char *operador;
     int operadorID;
     FilaCaixa *fila;
-    Pessoa *emAtendimento; //clientes em estado 1 ou 2
+    Pessoa *emAtendimento; // cliente atualmente em atendimento, estado 2
     int tempoAtendimentoDecorrido;
     int ativa; //1 = aberta e 0 = fechada
     int clientesAtendidos;

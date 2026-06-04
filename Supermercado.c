@@ -152,8 +152,7 @@ static void AdicionarClienteAoFim(NodoCliente **lista, Pessoa *cliente)
     atual->prox = novo;
 }
 
-// Remover primeiro cliente da lista (muda estado 0→1 e retorna ponteiro para Pessoa ou NULL)
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Inicializa o array de caixas do supermercado
 int InicializarCaixasSupermercado(ptSupermercado s)
 {
     int i;
@@ -192,7 +191,7 @@ static void AdicionarClienteAoSistema(ptSupermercado s, Pessoa *cliente)
     AdicionarClienteAoFim(&s->clientesEmCompras, cliente);
 }
 
-// Atualizar clientes em compras (muda estado 1→1)
+// Atualiza o tempo restante dos clientes que ainda estao em compras
 static void AtualizarClientesEmCompras(ptSupermercado s)
 {
     NodoCliente *atual;
@@ -210,7 +209,7 @@ static void AtualizarClientesEmCompras(ptSupermercado s)
     }
 }
 
-// Distribuir clientes para caixas (muda estado 1→1)
+// Move clientes que terminaram as compras para a fila de uma caixa
 static void DistribuirClientesParaCaixas(ptSupermercado s)
 {
     NodoCliente *atual;
@@ -514,7 +513,7 @@ static void GerirCaixasAutomaticamente(ptSupermercado s){
     }
 }
 
-// Função para processar caixa e atualizar estatísticas (muda estado 1→1)
+// Executa um segundo da simulacao e atualiza clientes, filas, caixas e estatisticas
 int ExecutarSimulacao(ptSupermercado s)
 {
     if (s== NULL || s->relogio== NULL ) return 0;
@@ -672,7 +671,7 @@ int AbrirCaixaSupermercado(Supermercado *s)
 }
 
 
-// Função para fechar uma caixa do supermercado e redistribuir clientes (muda estado 1→0)
+// Fecha uma caixa e redistribui os clientes em espera por outras caixas ativas
 int FecharCaixaSupermercado(Supermercado *s)
 {
     int i;

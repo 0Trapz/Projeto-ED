@@ -53,7 +53,7 @@ Caixa* CriarCaixa(int id, const char *operador, int operadorID) {
 void DestruirCaixa(Caixa *c) {
     if (!c) return;
     // Liberta APENAS nodos da fila
-    // Pessoas continuam vivas em UniversoClientes
+    // Clientes continuam vivos nas estruturas da simulacao/historico
     if (c->fila) {
         NoCaixa *atual = c->fila->inicio;
         while (atual) {
