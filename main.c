@@ -243,11 +243,12 @@ int main()
         printf("4 - Mostrar estatisticas finais\n");
         printf("5 - Abrir caixa\n");
         printf("6 - Fechar caixa\n");
-        printf("7 - Pesquisar cliente em espera\n");
-        printf("8 - Mover cliente para outra caixa\n");
-        printf("9 - Gravar Historico de Simulacao\n");
-        printf("10 - Mostrar memoria utilizada/desperdicada\n");
-        printf("11 - Listar clientes atendidos por caixa\n");
+        printf("7 - Mostrar clientes em fila\n");
+        printf("8 - Pesquisar cliente em espera\n");
+        printf("9 - Mover cliente para outra caixa\n");
+        printf("10 - Gravar Historico de Simulacao\n");
+        printf("11 - Mostrar memoria utilizada/desperdicada\n");
+        printf("12 - Listar clientes atendidos por caixa\n");
         printf("0 - Sair\n");
         printf("Opcao: ");
         if (scanf("%d", &opcao) != 1) {
@@ -272,13 +273,15 @@ int main()
                 break;
             case 7: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Pesquisar cliente em espera"); 
                 break;
-            case 8: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mover cliente para outra caixa"); 
+            case 8: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar clientes em fila"); 
                 break;
-            case 9: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Gravar Historico de Simulacao"); 
+            case 9: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mover cliente para outra caixa"); 
                 break;
-            case 10: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar memoria utilizada/desperdicada"); 
+            case 10: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Gravar Historico de Simulacao"); 
                 break;
-            case 11: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Listar clientes atendidos por caixa"); 
+            case 11: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Mostrar memoria utilizada/desperdicada"); 
+                break;
+            case 12: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Listar clientes atendidos por caixa"); 
                 break;
             case 0: RegistarAcaoMenuCSV("historico_menu.csv", opcao, "Sair");
                 break;
@@ -308,18 +311,21 @@ int main()
                 FecharCaixaSupermercado(Lidl);
                 break;
             case 7:
-                PesquisarClienteEmEspera(Lidl);
+                MostrarClientesEmFila(Lidl);
                 break;
             case 8:
-                MoverClienteParaOutraCaixa(Lidl);
+                PesquisarClienteEmEspera(Lidl);
                 break;
             case 9:
-                GravarHistoricoSimulacao(Lidl, "historico_simulacao.csv");
+                MoverClienteParaOutraCaixa(Lidl);
                 break;
             case 10:
-                MostrarMemoriaUtilizadaDesperdicada(Lidl);
+                GravarHistoricoSimulacao(Lidl, "historico_simulacao.csv");
                 break;
             case 11:
+                MostrarMemoriaUtilizadaDesperdicada(Lidl);
+                break;
+            case 12:
                 ListarClientesAtendidosPorCaixa(Lidl);
                 
                 break;

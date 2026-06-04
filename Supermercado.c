@@ -782,29 +782,119 @@ int FecharCaixaSupermercado(Supermercado *s)
 
 
 // Adicionar cliente à fila de caixa (muda estado 1→1)
-void PesquisarClienteEmEspera(Supermercado *s){
-    char id [16];
+static void MostrarClientesEmEspera(Supermercado *s)
+{
+    int i;
+    NoCaixa *atual;
+
+    if (s == NULL || s->caixas == NULL) return;
+
+    printf("\nClientes atualmente em espera:\n");
+
+    for (i = 0; i < s->config.nCaixas; i++) {
+        if (s->caixas[i] == NULL || s->caixas[i]->fila == NULL) continue;
+
+        printf("Caixa %d: ", s->caixas[i]->id);
+
+        atual = s->caixas[i]->fila->inicio;
+
+        if (atual == NULL) {
+            printf("sem clientes em espera");
+        }
+
+        while (atual != NULL) {
+            if (atual->cliente != NULL) {
+                printf("%s ", atual->cliente->id);
+            }
+            atual = atual->prox;
+        }
+
+        printf("\n");
+    }
+
+    printf("\n");
+}
+
+void PesquisarClienteEmEspera(Supermercado *s)
+{
+    char id[16];
     int i;
     int posicao;
     Pessoa *cliente;
 
     if (s == NULL || s->caixas == NULL) return;
+
+    MostrarClientesEmEspera(s);
+
     printf("Digite o ID do cliente para pesquisar: ");
     scanf("%15s", id);
 
-    for(i=0; i < s->config.nCaixas; i++){
+    for (i = 0; i < s->config.nCaixas; i++) {
         if (s->caixas[i] == NULL) continue;
-        
+
         posicao = 0;
         cliente = ProcurarClienteFila(s->caixas[i], id, &posicao);
 
         if (cliente != NULL) {
-            printf("Cliente %s encontrado na caixa %d, posição %d na fila.\n", cliente->id, s->caixas[i]->id, posicao);
-            printf("Tempo de espera atual: %d segundos\n", cliente->tempoEspera);
+            printf("Cliente %s esta em espera na caixa %d, posicao %d na fila.\n",
+                   cliente->id,
+                   s->caixas[i]->id,
+                   posicao);
+
+            printf("Tempo de espera atual: %d segundos\n",
+                   cliente->tempoEspera);
+
             return;
         }
     }
-    printf("[INFO] Cliente %s não foi encontrado em nenhuma fila da caixa.\n", id);
+
+    printf("[INFO] Cliente %s nao esta em espera em nenhuma caixa.\n", id);
+}
+void MostrarClientesEmFila(ptSupermercado s)
+{
+    int i;
+    NoCaixa *atual;
+    int encontrou = 0;
+
+    if (s == NULL || s->caixas == NULL) {
+        printf("[ERRO] Supermercado invalido.\n");
+        return;
+    }
+
+    printf("\n========== CLIENTES EM FILA ==========\n");
+
+    for (i = 0; i < s->config.nCaixas; i++) {
+        if (s->caixas[i] == NULL || s->caixas[i]->fila == NULL) continue;
+
+        printf("\nCaixa %d (%s) - fila: %d\n",
+               s->caixas[i]->id,
+               s->caixas[i]->ativa ? "ativa" : "inativa",
+               TamanhoDaFila(s->caixas[i]));
+
+        atual = s->caixas[i]->fila->inicio;
+
+        if (atual == NULL) {
+            printf("  Sem clientes em fila.\n");
+        }
+
+        while (atual != NULL) {
+            if (atual->cliente != NULL) {
+                printf("  ID: %s | Nome: %s | Espera: %d segundos\n",
+                       atual->cliente->id,
+                       atual->cliente->nome,
+                       atual->cliente->tempoEspera);
+                encontrou = 1;
+            }
+
+            atual = atual->prox;
+        }
+    }
+
+    if (!encontrou) {
+        printf("\n[INFO] Nao existem clientes em fila neste momento.\n");
+    }
+
+    printf("======================================\n");
 }
 
 // Adicionar cliente à fila de caixa (muda estado 1→1)
@@ -816,6 +906,8 @@ void MoverClienteParaOutraCaixa(Supermercado *s){
     Pessoa *cliente;
     Caixa *destino;
     if (s == NULL || s->caixas == NULL) return;
+
+     MostrarClientesEmEspera(s);
 
      printf("Digite o ID do cliente para mover: ");
      scanf("%15s", id);

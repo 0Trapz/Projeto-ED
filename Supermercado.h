@@ -78,6 +78,7 @@ int MostrarSupermercado(ptSupermercado s);
 int AbrirCaixaSupermercado(ptSupermercado s);
 int FecharCaixaSupermercado(ptSupermercado s);
 void PesquisarClienteEmEspera(ptSupermercado s);
+void MostrarClientesEmFila(ptSupermercado s);
 void MoverClienteParaOutraCaixa(ptSupermercado s);
 int GravarHistoricoSimulacao(ptSupermercado s, char *nomeFicheiro);
 void MostrarMemoriaUtilizadaDesperdicada(ptSupermercado s);
