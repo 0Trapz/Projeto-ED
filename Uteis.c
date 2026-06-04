@@ -54,6 +54,7 @@ int LerLinhaFicheiro(FILE *f, char *destino, int tamanho) {
     return 1;
 }
 
+// Regista uma ação de menu num ficheiro CSV
 void RegistarAcaoMenuCSV(const char *ficheiro, int opcao, const char *descricao) {
 
     FILE *f;
@@ -67,6 +68,7 @@ void RegistarAcaoMenuCSV(const char *ficheiro, int opcao, const char *descricao)
     fclose(f);
 }
 
+// Função para pausar a página após um número específico de ações
 void PausarPagina(int *contador, int limite){
 if (contador == NULL || limite <= 0 ) return; 
 

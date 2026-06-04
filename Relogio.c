@@ -24,6 +24,7 @@ void DestruirRelogio(ptRelogio r){
     if (r) free(r);
 }
 
+// Função para mostrar a hora atual do relógio
 void MostrarRelogio(ptRelogio r){
     if (!r) return;
     printf("%02d:%02d:%02d\n", r->horas, r->minutos, r->segundos);

@@ -73,7 +73,7 @@ Supermercado *CriarSupermercado(char *nome)
 
 }
 
-// Função para destruir supermercado
+// Função para inicializar supermercado
 int InicializarSupermercado(ptSupermercado s, char *config){
     FILE *f;
     char chave[64];
@@ -101,7 +101,7 @@ int InicializarSupermercado(ptSupermercado s, char *config){
 
 }
 
-// Função para destruir supermercado
+// Função para carregar funcionários
 int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios){
     FILE *f;
     char nome[MAX_NOME_FUNCIONARIO + 1];
@@ -126,7 +126,7 @@ int CarregarFuncionarios(ptSupermercado s, char *nomeFicheiroFuncionarios){
     return 1;
 }
 
-// Função para destruir supermercado
+// Função para adicionar cliente ao final da lista
 static void AdicionarClienteAoFim(NodoCliente **lista, Pessoa *cliente)
 {
     NodoCliente *novo;
@@ -192,9 +192,7 @@ static void AdicionarClienteAoSistema(ptSupermercado s, Pessoa *cliente)
     AdicionarClienteAoFim(&s->clientesEmCompras, cliente);
 }
 
-
-
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Atualizar clientes em compras (muda estado 1→1)
 static void AtualizarClientesEmCompras(ptSupermercado s)
 {
     NodoCliente *atual;
@@ -212,6 +210,7 @@ static void AtualizarClientesEmCompras(ptSupermercado s)
     }
 }
 
+// Distribuir clientes para caixas (muda estado 1→1)
 static void DistribuirClientesParaCaixas(ptSupermercado s)
 {
     NodoCliente *atual;
@@ -272,7 +271,7 @@ static void DistribuirClientesParaCaixas(ptSupermercado s)
     }
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Funçao para obter índice do próximo funcionário livre
 int ObterFuncionarioLivre(ptSupermercado s)
 {
    int i;
@@ -283,7 +282,7 @@ int ObterFuncionarioLivre(ptSupermercado s)
    return -1;
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Atribuir próximo funcionário livre a caixa
 int AtribuirFuncionarioLivre(ptSupermercado s)
 {
     int indice = ObterFuncionarioLivre(s);
@@ -295,7 +294,7 @@ int AtribuirFuncionarioLivre(ptSupermercado s)
     
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Liberar funcionário de caixa (muda estado 1→0)
 void LibertarFuncionario(ptSupermercado s, int indice)
 {
     if (s== NULL) return;
@@ -303,7 +302,7 @@ void LibertarFuncionario(ptSupermercado s, int indice)
     s->funcionarioEmUso[indice] = 0; // Marcar como livre
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Verificar se funcionário está em uso
 int FuncionarioEmUso(ptSupermercado s, int idFuncionario)
 {
     if (s == NULL) return 0;
@@ -311,7 +310,7 @@ int FuncionarioEmUso(ptSupermercado s, int idFuncionario)
     return s->funcionarioEmUso[idFuncionario];
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Mostrar estado do supermercado
 void MostrarFuncionarios(ptSupermercado s)
 {
     int i;
@@ -326,7 +325,7 @@ void MostrarFuncionarios(ptSupermercado s)
     }
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Mostrar estado do supermercado
 int MostrarSupermercado(ptSupermercado s)
 {
     int i;
@@ -367,7 +366,7 @@ int MostrarSupermercado(ptSupermercado s)
     return 1;
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Funçao para adicionar cliente ao sistema (muda estado 0→1)
 void EntradaPessoaSupermercado(ptSupermercado s){
     int x;
     Pessoa *cliente;
@@ -391,7 +390,7 @@ void EntradaPessoaSupermercado(ptSupermercado s){
     }
 } 
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Atualizar tempo de espera dos clientes na fila e aplicar ofertas se necessário
 static void AtualizarFilaEspera(ptSupermercado s){
     int i; 
     NoCaixa *atual;
@@ -515,7 +514,7 @@ static void GerirCaixasAutomaticamente(ptSupermercado s){
     }
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para processar caixa e atualizar estatísticas (muda estado 1→1)
 int ExecutarSimulacao(ptSupermercado s)
 {
     if (s== NULL || s->relogio== NULL ) return 0;
@@ -547,7 +546,7 @@ int ExecutarSimulacao(ptSupermercado s)
     return 1;
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para verificar se o supermercado está para fechar
 int Supermercado_E_Para_Fechar(Supermercado *s)
 {
     int horaAtual;
@@ -563,7 +562,7 @@ int Supermercado_E_Para_Fechar(Supermercado *s)
     return 0;
 }
 
-
+// Função para verificar se o supermercado está vazio (sem clientes em compras e filas vazias)
 int Supermercado_Vazio(ptSupermercado s)
 {
     int i;
@@ -590,6 +589,7 @@ int Supermercado_Vazio(ptSupermercado s)
     return 1;
 }
 
+// Função para verificar se a simulação terminou (supermercado para fechar e vazio)
 int SimulacaoTerminada(ptSupermercado s)
 {
     if (s == NULL) return 1;
@@ -600,8 +600,7 @@ int SimulacaoTerminada(ptSupermercado s)
     return 0; // Simulação ainda em andamento
 }
 
-
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para destruir supermercado e liberar memória
 void DestruirSupermercado(ptSupermercado s)
 {
 
@@ -626,7 +625,7 @@ void DestruirSupermercado(ptSupermercado s)
 
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para abrir uma caixa do supermercado
 int AbrirCaixaSupermercado(Supermercado *s)
 {
     int numeroCaixa;
@@ -673,7 +672,7 @@ int AbrirCaixaSupermercado(Supermercado *s)
 }
 
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para fechar uma caixa do supermercado e redistribuir clientes (muda estado 1→0)
 int FecharCaixaSupermercado(Supermercado *s)
 {
     int i;
@@ -780,8 +779,7 @@ int FecharCaixaSupermercado(Supermercado *s)
     return 1;
 }
 
-
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para mostrar clientes em espera em todas as caixas
 static void MostrarClientesEmEspera(Supermercado *s)
 {
     int i;
@@ -815,6 +813,7 @@ static void MostrarClientesEmEspera(Supermercado *s)
     printf("\n");
 }
 
+// Função para pesquisar cliente em espera por ID e mostrar detalhes
 void PesquisarClienteEmEspera(Supermercado *s)
 {
     char id[16];
@@ -850,6 +849,8 @@ void PesquisarClienteEmEspera(Supermercado *s)
 
     printf("[INFO] Cliente %s nao esta em espera em nenhuma caixa.\n", id);
 }
+
+// Função para mostrar detalhes dos clientes em espera em todas as caixas
 void MostrarClientesEmFila(ptSupermercado s)
 {
     int i;
@@ -897,7 +898,7 @@ void MostrarClientesEmFila(ptSupermercado s)
     printf("======================================\n");
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para mover cliente de uma caixa para outra (muda estado 1→1)
 void MoverClienteParaOutraCaixa(Supermercado *s){
     char id[16];
     int caixaDestino;
@@ -955,7 +956,7 @@ void MoverClienteParaOutraCaixa(Supermercado *s){
     printf("[OK] Cliente %s movido da caixa %d para a caixa %d.\n", id, s->caixas[origem]->id, destino->id);
 }
 
-// Adicionar cliente à fila de caixa
+// Função para gravar histórico da simulação em arquivo CSV
 int GravarHistoricoSimulacao(Supermercado *s, char *nomeFicheiro){
      FILE *f;
     NodoCliente *atual;
@@ -1013,7 +1014,7 @@ int GravarHistoricoSimulacao(Supermercado *s, char *nomeFicheiro){
     return 1;
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para mostrar memória utilizada e desperdiçada (aproximada)
 void MostrarMemoriaUtilizadaDesperdicada(Supermercado *s){
     int i;
     size_t memoriaUsada = 0;
@@ -1096,7 +1097,7 @@ void MostrarMemoriaUtilizadaDesperdicada(Supermercado *s){
     printf("=============================\n\n");
 }
 
-// Adicionar cliente à fila de caixa (muda estado 1→1)
+// Função para listar clientes atendidos por caixa e mostrar detalhes de cada cliente
 void ListarClientesAtendidosPorCaixa(ptSupermercado s)
 {
     int numeroCaixa;
