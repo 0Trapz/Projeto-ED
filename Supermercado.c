@@ -554,7 +554,7 @@ int Supermercado_E_Para_Fechar(Supermercado *s)
 
     horaAtual = s->relogio->horas;
 
-    if (horaAtual >= s->config.horaFecho) {
+    if (horaAtual < s->config.horaAbertura || horaAtual >= s->config.horaFecho) {
         return 1;
     }
 
